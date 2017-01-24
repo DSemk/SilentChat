@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "262675860616-4qp4487rqrus4e21uv5qgopiti1o1hb1.apps.googleusercontent.com",
+          "client_id": "262675860616-rjfccpbe9c23sk5kik4eppc7467i127d.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.disemk.silentchat",
-            "certificate_hash": "CB647CBA1F9483A91C2752F5BAE0AF748EA17364"
+            "certificate_hash": "0C4F1471CCE833998FB64B84BCF4625DDA854E0E"
           }
         },
         {

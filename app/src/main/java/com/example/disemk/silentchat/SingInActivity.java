@@ -80,6 +80,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
         };
     }
 
+    // Check you are a new user,or not.
     private void checkUserAuth() {
         if (mFirebaseUser != null) {
             startActivity(new Intent(SingInActivity.this, ChatActivity.class));
@@ -102,7 +103,6 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-
     }
 
     private void authorize() {
@@ -122,6 +122,8 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             } else {
                 Toast.makeText(getApplicationContext(), "SingIn Faild!", Toast.LENGTH_SHORT).show();
             }
+        } else {
+            Log.d(TAG, " onActivityResult : warm requestCode");
         }
     }
 
