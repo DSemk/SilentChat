@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "262675860616",
+    "firebase_url": "https://silentchat-5454d.firebaseio.com",
+    "project_id": "silentchat-5454d",
+    "storage_bucket": "silentchat-5454d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:262675860616:android:924aa397c34d33f0",
+        "android_client_info": {
+          "package_name": "com.example.disemk.silentchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "262675860616-4qp4487rqrus4e21uv5qgopiti1o1hb1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.disemk.silentchat",
+            "certificate_hash": "CB647CBA1F9483A91C2752F5BAE0AF748EA17364"
+          }
+        },
+        {
+          "client_id": "262675860616-gnuvo358bl4dne5u8rhrct8kdhgg71ju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkVXKLA8_PDi8SK9eK0VB3PNsLUK3U4HI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "262675860616-gnuvo358bl4dne5u8rhrct8kdhgg71ju.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Silent Chat</string>
+    <string name="title_activity_chat">ChatActivity</string>
+</resources>
