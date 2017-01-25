@@ -7,18 +7,20 @@ import java.util.List;
  */
 
 public class ChatRoom {
-    List<String> roomName;
+    String roomName;
 
-    public ChatRoom(List<String> roomName) {
+    public ChatRoom() {
+    }
+
+    public ChatRoom(String roomName) {
         this.roomName = roomName;
     }
 
-    public List<String> getRoomName() {
+    public String getRoomName() {
         return roomName;
     }
 
-    public void setRoomName(List<String> roomName) {
+    public void setRoomName(String roomName) {
         this.roomName = roomName;
     }
-
 }

@@ -1,11 +1,16 @@
 package com.example.disemk.silentchat;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,15 +20,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class RoomsActivity extends AppCompatActivity {
-    private static final String CHILD_THREE = "silentchat-5454d";
-    public String userRoomName;
+    private static final String CHILD_THREE = "all rooms";
     private final static String USER_ROOM_NAME_DEFAULT = "Default room name";
+    public String userRoomName;
 
     private DatabaseReference mDatabaseReference;
     private FirebaseRecyclerAdapter<ChatRoom, FireChatRoomViewHolder> mFirebaseRecyclerAdapter;
     private RecyclerView mRoomRecyclerView;
     private LinearLayoutManager mLinerLayoutManager;
     private ProgressBar mProgressBar;
+    private Button mAddRoom;
+    private EditText mRoomName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +43,9 @@ public class RoomsActivity extends AppCompatActivity {
     private void initialize() {
         mProgressBar = (ProgressBar) findViewById(R.id.ar_progressBar);
         mRoomRecyclerView = (RecyclerView) findViewById(R.id.roomRecyclerView);
+        mAddRoom = (Button) findViewById(R.id.ar_addRoom);
+        mRoomName = (EditText) findViewById(R.id.ar_addRoomName);
+
         mLinerLayoutManager = new LinearLayoutManager(this);
         mLinerLayoutManager.setStackFromEnd(true);
         mRoomRecyclerView.setLayoutManager(mLinerLayoutManager);
@@ -48,9 +58,15 @@ public class RoomsActivity extends AppCompatActivity {
                 mDatabaseReference.child(CHILD_THREE)
         ) {
             @Override
-            protected void populateViewHolder(FireChatRoomViewHolder viewHolder, ChatRoom model, int position) {
+            protected void populateViewHolder(final FireChatRoomViewHolder viewHolder, ChatRoom model, final int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-//                viewHolder.roomNameText.setText(model.getRoomName());
+                viewHolder.roomNameText.setText(model.getRoomName());
+                viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onItemClickCustom(v, position, viewHolder);
+                    }
+                });
             }
         };
 
@@ -58,10 +74,10 @@ public class RoomsActivity extends AppCompatActivity {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-                int chatMsgCount = mFirebaseRecyclerAdapter.getItemCount();
+                int roomNameCount = mFirebaseRecyclerAdapter.getItemCount();
                 int lastVisiblePosition = mLinerLayoutManager.findLastCompletelyVisibleItemPosition();
                 if (lastVisiblePosition == -1 ||
-                        (positionStart >= (chatMsgCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                        (positionStart >= (roomNameCount - 1) && lastVisiblePosition == (positionStart - 1))) {
                     mRoomRecyclerView.scrollToPosition(positionStart);
                 }
             }
@@ -69,19 +85,73 @@ public class RoomsActivity extends AppCompatActivity {
 
         });
 
+
         mRoomRecyclerView.setLayoutManager(mLinerLayoutManager);
         mRoomRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
 
+        mAddRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addNewRoom();
+            }
+        });
+
+
     }
 
-    private static class FireChatRoomViewHolder extends RecyclerView.ViewHolder {
+    private void onItemClickCustom(View v, int position, FireChatRoomViewHolder viewHolder) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("userRoom", viewHolder.roomNameText.getText().toString());
+        startActivity(intent);
+    }
+
+    private void addNewRoom() {
+        LayoutInflater layoutInflater = LayoutInflater.from(RoomsActivity.this);
+        View view = layoutInflater.inflate(R.layout.room_add_new, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(RoomsActivity.this);
+        builder.setView(view);
+        final EditText editName = (EditText) view.findViewById(R.id.ad_addNewRoom_et);
+
+        builder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (editName.getText().toString().isEmpty()) {
+//                            Toast.makeText(getApplicationContext(),"Введите название комнаты",Toast.LENGTH_SHORT).show();
+                        } else {
+                            userRoomName = editName.getText().toString();
+                            ChatRoom newRoom = new ChatRoom(
+                                    userRoomName);
+                            mDatabaseReference.child(CHILD_THREE).push().setValue(newRoom);
+                            Intent intent = new Intent(RoomsActivity.this, ChatActivity.class);
+                            intent.putExtra("userRoom", userRoomName);
+                            startActivity(intent);
+                        }
+                    }
+                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setTitle("Введите название комнаты");
+        alertDialog.show();
+
+
+    }
+
+    public static class FireChatRoomViewHolder extends RecyclerView.ViewHolder {
         public TextView roomNameText;
-        public TextView userRoomCountText;
+//        public TextView userRoomCountText;
 
         public FireChatRoomViewHolder(View view) {
             super(view);
             roomNameText = (TextView) view.findViewById(R.id.ar_roomName);
-            userRoomCountText = (TextView) view.findViewById(R.id.ar_userCount);
+//            userRoomCountText = (TextView) view.findViewById(R.id.ar_userCount);
         }
     }
+
 }

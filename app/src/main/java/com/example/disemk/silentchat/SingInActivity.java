@@ -83,7 +83,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     // Check you are a new user,or not.
     private void checkUserAuth() {
         if (mFirebaseUser != null) {
-            startActivity(new Intent(SingInActivity.this, ChatActivity.class));
+            startActivity(new Intent(SingInActivity.this, RoomsActivity.class));
             finish();
             Toast.makeText(SingInActivity.this, "Auth. is success!", Toast.LENGTH_SHORT).show();
         }
@@ -145,7 +145,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                             Toast.makeText(SingInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            startActivity(new Intent(SingInActivity.this, ChatActivity.class));
+                            startActivity(new Intent(SingInActivity.this, RoomsActivity.class));
                             finish();
                         }
 

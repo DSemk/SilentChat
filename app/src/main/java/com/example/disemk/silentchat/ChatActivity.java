@@ -1,5 +1,6 @@
 package com.example.disemk.silentchat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,6 +29,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String CHILD_TREE = "massages";
+    private String romName;
 
     private DatabaseReference mDatabaseReference;
     private FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder> mFBAdapter;
@@ -50,6 +52,8 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        romName = getIntent().getStringExtra("userRoom");
 
         initialize();
 
@@ -75,7 +79,7 @@ public class ChatActivity extends AppCompatActivity {
                 ChatMessage.class,
                 R.layout.chat_message,
                 FirechatMsgViewHolder.class,
-                mDatabaseReference.child(CHILD_TREE)
+                mDatabaseReference.child(romName)
         ) {
 
             @Override
@@ -120,8 +124,8 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!mMsgEText.getText().toString().isEmpty()) {
                     ChatMessage frendlyMsg = new ChatMessage(
-                            mMsgEText.getText().toString(), mUsername, mPhotoUrl);
-                    mDatabaseReference.child("massages").push().setValue(frendlyMsg);
+                            mMsgEText.getText().toString(), mUsername, mPhotoUrl, romName);
+                    mDatabaseReference.child(romName).push().setValue(frendlyMsg);
                     mMsgEText.setText("");
                 } else {
                     Toast.makeText(getApplicationContext(), "Enter msg first!", Toast.LENGTH_SHORT).show();
