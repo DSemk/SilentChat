@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Silent Chat</string>
+    <string name="as_title_ru">Добро Пожаловать</string>
+    <string name="as_title_en">Welcome</string>
     <string name="title_activity_chat">ChatActivity</string>
     <string name="title_activity_main_temp">MainActivity_temp</string>
-    <string name="sing_info">Данное приложение представляет собой анонимный чат.
+    <string name="sing_info_ru">
+        Данное приложение представляет собой анонимный чат.
         Вся информация которая видна пользователям данного приложения это ваши
         данные аккаунта Google,такие как имя,фамилия,и фото аккаунта Google.
         Вход в приложение и регистрация в нем доступна исключительно с помощью аккаунта Google.

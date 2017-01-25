@@ -52,8 +52,10 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        setTitle("Комната : " + romName);
+
         romName = getIntent().getStringExtra("userRoom");
+
+        setTitle("Комната : " + romName);
 
         initialize();
 
@@ -65,6 +67,8 @@ public class ChatActivity extends AppCompatActivity {
         mMsgEText = (EditText) findViewById(R.id.msgEditText);
         mSendButtn = (Button) findViewById(R.id.sendButton);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(ProgressBar.VISIBLE);
+
         mMsgRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
