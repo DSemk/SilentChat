@@ -2,6 +2,7 @@ package com.example.disemk.silentchat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,8 +30,7 @@ public class RoomsActivity extends AppCompatActivity {
     private RecyclerView mRoomRecyclerView;
     private LinearLayoutManager mLinerLayoutManager;
     private ProgressBar mProgressBar;
-    private Button mAddRoom;
-    private EditText mRoomName;
+    private FloatingActionButton mAddRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +43,7 @@ public class RoomsActivity extends AppCompatActivity {
     private void initialize() {
         mProgressBar = (ProgressBar) findViewById(R.id.ar_progressBar);
         mRoomRecyclerView = (RecyclerView) findViewById(R.id.roomRecyclerView);
-        mAddRoom = (Button) findViewById(R.id.ar_addRoom);
-        mRoomName = (EditText) findViewById(R.id.ar_addRoomName);
+        mAddRoom = (FloatingActionButton) findViewById(R.id.ar_addRoom);
 
         mLinerLayoutManager = new LinearLayoutManager(this);
         mLinerLayoutManager.setStackFromEnd(true);
@@ -82,7 +81,6 @@ public class RoomsActivity extends AppCompatActivity {
                 }
             }
 
-
         });
 
 
@@ -95,8 +93,6 @@ public class RoomsActivity extends AppCompatActivity {
                 addNewRoom();
             }
         });
-
-
     }
 
     private void onItemClickCustom(View v, int position, FireChatRoomViewHolder viewHolder) {

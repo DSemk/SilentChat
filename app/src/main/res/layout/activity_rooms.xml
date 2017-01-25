@@ -12,34 +12,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.disemk.silentchat.RoomsActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/roomRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/ar_linearLayout" />
-
-    <LinearLayout
-        android:id="@+id/ar_linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:orientation="horizontal">
-
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/ar_addRoomName" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/ar_addRoom"
-            android:text="Add Room" />
-
-    </LinearLayout>
-
     <ProgressBar
         android:id="@+id/ar_progressBar"
         style="?android:attr/progressBarStyleLarge"
@@ -47,6 +19,32 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/roomRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/ar_addRoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:src="@drawable/basic_plus_icon"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_margin="@dimen/fab_margin"
+            android:layout_gravity="right|end|top" />
+    </RelativeLayout>
 
 
 </RelativeLayout>
