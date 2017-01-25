@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -40,6 +41,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private SignInButton mSignInButton;
+    private CheckBox checkInfo;
 
 
     @Override
@@ -91,11 +93,17 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
 
 
     private void initialize() {
+        checkInfo = (CheckBox) findViewById(R.id.as_checkBox);
         mSignInButton = (SignInButton) findViewById(R.id.singIn_btn);
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                authorize();
+                if (checkInfo.isChecked()) {
+                    authorize();
+                } else {
+                    Toast.makeText(SingInActivity.this, "Сначала приймите правила лиц. соглашения", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

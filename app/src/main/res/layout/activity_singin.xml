@@ -4,12 +4,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:text="@string/sing_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:textSize="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp"
+        android:id="@+id/as_text_info" />
+
     <com.google.android.gms.common.SignInButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"
         android:id="@+id/singIn_btn"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"></com.google.android.gms.common.SignInButton>
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="46dp"></com.google.android.gms.common.SignInButton>
+
+    <CheckBox
+        android:text="Я принимаю эти условия."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/as_checkBox"
+        android:layout_above="@+id/singIn_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp" />
 
 </RelativeLayout>

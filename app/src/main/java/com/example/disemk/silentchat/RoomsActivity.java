@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class RoomsActivity extends AppCompatActivity {
+    private static final String TITEL_NAME = "Комнаты";
     private static final String CHILD_THREE = "all rooms";
     private final static String USER_ROOM_NAME_DEFAULT = "Default room name";
     public String userRoomName;
@@ -36,6 +37,7 @@ public class RoomsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rooms);
+        setTitle("Комнаты");
 
         initialize();
     }
