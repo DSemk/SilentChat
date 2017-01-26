@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +31,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ChatActivity extends AppCompatActivity {
     private static final String CHILD_TREE = "massages";
     private String romName;
+    private int msgLayout;
 
     private DatabaseReference mDatabaseReference;
     private FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder> mFBAdapter;
@@ -42,9 +44,6 @@ public class ChatActivity extends AppCompatActivity {
     private String mUsername;
     private String mPhotoUrl;
 
-    // if editText !is.Emprye() - true;
-    private boolean canPush;
-
     private Button mSendButtn;
     private EditText mMsgEText;
 
@@ -52,9 +51,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
         romName = getIntent().getStringExtra("userRoom");
-
         setTitle("Комната : " + romName);
 
         initialize();
@@ -63,6 +60,7 @@ public class ChatActivity extends AppCompatActivity {
 
     // init all components
     private void initialize() {
+        msgLayout = R.layout.chat_message;
 
         mMsgEText = (EditText) findViewById(R.id.msgEditText);
         mSendButtn = (Button) findViewById(R.id.sendButton);
@@ -79,49 +77,8 @@ public class ChatActivity extends AppCompatActivity {
         mMsgRecyclerView.setLayoutManager(mLayoutManager);
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mFBAdapter = new FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder>(
-                ChatMessage.class,
-                R.layout.chat_message,
-                FirechatMsgViewHolder.class,
-                mDatabaseReference.child(romName)
-        ) {
 
-            @Override
-            protected void populateViewHolder(FirechatMsgViewHolder firechatMsgViewHolder, ChatMessage chatMessage, int i) {
-                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                firechatMsgViewHolder.msgText.setText(chatMessage.getText());
-                firechatMsgViewHolder.userText.setText(chatMessage.getName());
-
-                if (mFirebaseUser.getPhotoUrl() == null) {
-                    firechatMsgViewHolder.userImage.setImageDrawable(
-                            ContextCompat.getDrawable(ChatActivity.this, R.drawable.ic_account_circle_black_36dp));
-                } else {
-                    mUsername = mFirebaseUser.getDisplayName();
-                    mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
-                    Glide.with(ChatActivity.this).
-                            load(chatMessage.getPhotoUrl()).into(firechatMsgViewHolder.userImage);
-                }
-            }
-        };
-
-        mFBAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                int chatMsgCount = mFBAdapter.getItemCount();
-                int lastVisiblePosition = mLayoutManager.findLastCompletelyVisibleItemPosition();
-                if (lastVisiblePosition == -1 ||
-                        (positionStart >= (chatMsgCount - 1) && lastVisiblePosition == (positionStart - 1))) {
-                    mMsgRecyclerView.scrollToPosition(positionStart);
-                }
-            }
-        });
-
-        mMsgRecyclerView.setLayoutManager(mLayoutManager);
-        mMsgRecyclerView.setAdapter(mFBAdapter);
-
-        mUsername = mFirebaseUser.getDisplayName().toString();
-
+        setmFBAdapterUn();
 
         mSendButtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +113,63 @@ public class ChatActivity extends AppCompatActivity {
         mMsgRecyclerView.setAdapter(mFBAdapter);
 
 
+    }
+
+    //TODO : If it's this user msg, use chat_message_my layout, else chat_message
+
+    private void setmFBAdapterUn() {
+
+        mFBAdapter = new FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder>(
+                ChatMessage.class,
+                R.layout.chat_message,
+                FirechatMsgViewHolder.class,
+                mDatabaseReference.child(romName)
+        ) {
+
+            @Override
+            protected void populateViewHolder(FirechatMsgViewHolder firechatMsgViewHolder, ChatMessage chatMessage, int i) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+
+//                if(mFirebaseUser.getDisplayName().equals(chatMessage.getName())){
+//                    mLayoutManager.setOrientation(Gravity.RIGHT);
+//                }
+//                else {
+//                    mLayoutManager.setOrientation(Gravity.LEFT);
+//                }
+
+                firechatMsgViewHolder.msgText.setText(chatMessage.getText());
+                firechatMsgViewHolder.userText.setText(chatMessage.getName());
+
+
+                if (mFirebaseUser.getPhotoUrl() == null) {
+                    firechatMsgViewHolder.userImage.setImageDrawable(
+                            ContextCompat.getDrawable(ChatActivity.this, R.drawable.ic_account_circle_black_36dp));
+                } else {
+                    mUsername = mFirebaseUser.getDisplayName();
+                    mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+                    Glide.with(ChatActivity.this).
+                            load(chatMessage.getPhotoUrl()).into(firechatMsgViewHolder.userImage);
+                }
+            }
+        };
+
+        mFBAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int chatMsgCount = mFBAdapter.getItemCount();
+                int lastVisiblePosition = mLayoutManager.findLastCompletelyVisibleItemPosition();
+                if (lastVisiblePosition == -1 ||
+                        (positionStart >= (chatMsgCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                    mMsgRecyclerView.scrollToPosition(positionStart);
+                }
+            }
+        });
+
+        mMsgRecyclerView.setLayoutManager(mLayoutManager);
+        mMsgRecyclerView.setAdapter(mFBAdapter);
+
+        mUsername = mFirebaseUser.getDisplayName().toString();
     }
 
     public static class FirechatMsgViewHolder extends RecyclerView.ViewHolder {

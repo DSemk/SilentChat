@@ -13,7 +13,8 @@
         android:id="@+id/messageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/linearLayout" />
+        android:layout_above="@+id/linearLayout"
+        android:background="@drawable/back_1" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
