@@ -10,8 +10,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".SingInActivity"
-            android:title="@string/as_title_ru"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:title="@string/as_title_ru">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,6 +20,7 @@
         </activity>
         <activity android:name=".ChatActivity" />
         <activity android:name=".RoomsActivity" />
+        <activity android:name=".SettingsActivity"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"

@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -51,11 +52,29 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         romName = getIntent().getStringExtra("userRoom");
         setTitle("Комната : " + romName);
 
         initialize();
 
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //Write your logic here
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     // init all components
@@ -79,6 +98,7 @@ public class ChatActivity extends AppCompatActivity {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         setmFBAdapterUn();
+        setBackground();
 
         mSendButtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,6 +203,15 @@ public class ChatActivity extends AppCompatActivity {
             userText = (TextView) view.findViewById(R.id.userTextView);
             userImage = (CircleImageView) view.findViewById(R.id.userImageView);
         }
+    }
+
+    private void setBackground() {
+        RecyclerView view = (RecyclerView) findViewById(R.id.messageRecyclerView);
+        int id = SingletonCM.getInstance().getBackgroundID();
+        if (id != 0) {
+            view.setBackgroundResource(id);
+        }
+
     }
 
 

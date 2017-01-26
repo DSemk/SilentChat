@@ -4,5 +4,5 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorRoom">#1b50a6</color>
-    <color name="colorRoomText">#ffffff</color>
+    <color name="colorRoomText">#000000</color>
 </resources>

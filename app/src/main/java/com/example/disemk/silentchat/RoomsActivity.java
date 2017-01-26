@@ -9,11 +9,14 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.disemk.silentchat.models.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -23,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 public class RoomsActivity extends AppCompatActivity {
     private static final String TITEL_NAME = "Комнаты";
     private static final String CHILD_THREE = "all rooms";
-    private final static String USER_ROOM_NAME_DEFAULT = "Default room name";
     public String userRoomName;
 
     private DatabaseReference mDatabaseReference;
@@ -37,9 +39,25 @@ public class RoomsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rooms);
-        setTitle("Комнаты");
-
+        setTitle(TITEL_NAME);
+        setBackground();
         initialize();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.main_settings) {
+            Intent intent = new Intent(RoomsActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initialize() {
@@ -150,6 +168,15 @@ public class RoomsActivity extends AppCompatActivity {
             roomNameText = (TextView) view.findViewById(R.id.ar_roomName);
 //            userRoomCountText = (TextView) view.findViewById(R.id.ar_userCount);
         }
+    }
+
+    private void setBackground() {
+        RecyclerView view = (RecyclerView) findViewById(R.id.roomRecyclerView);
+        int id = SingletonCM.getInstance().getBackgroundID();
+        if (id != 0) {
+            view.setBackgroundResource(id);
+        }
+
     }
 
 }
