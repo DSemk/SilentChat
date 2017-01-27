@@ -2,6 +2,7 @@ package com.example.disemk.silentchat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,11 @@ import com.google.firebase.database.FirebaseDatabase;
 public class RoomsActivity extends AppCompatActivity {
     private static final String TITEL_NAME = "Комнаты";
     private static final String CHILD_THREE = "all rooms";
+    public static final String APP_PREFERENCES = "mysettings_silent";
+    public static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
+
+    private SharedPreferences mSharedPreferences;
+
     public String userRoomName;
 
     private DatabaseReference mDatabaseReference;
@@ -40,9 +46,9 @@ public class RoomsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rooms);
         setTitle(TITEL_NAME);
-        setBackground();
-        initialize();
 
+        initialize();
+        setBackground();
     }
 
     @Override
@@ -133,9 +139,8 @@ public class RoomsActivity extends AppCompatActivity {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (editName.getText().toString().isEmpty()) {
-//                            Toast.makeText(getApplicationContext(),"Введите название комнаты",Toast.LENGTH_SHORT).show();
-                        } else {
+                        if (!editName.getText().toString().isEmpty()) {
+
                             userRoomName = editName.getText().toString();
                             ChatRoom newRoom = new ChatRoom(
                                     userRoomName);

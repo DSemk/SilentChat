@@ -2,6 +2,8 @@ package com.example.disemk.silentchat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +13,9 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -34,7 +39,10 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class SingInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "SingInActivity";
+    public static final String APP_PREFERENCES = "mysettings_silent";
+    public static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
 
+    private SharedPreferences mSharedPreferences;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -44,10 +52,17 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     private CheckBox checkInfo;
 
 
+    /**
+     * @metod - loadSharPrefData() - load user settings chenges;
+     * @metod initialize() - init all items & all ;
+     * @metod checkUserAuth() - check user is already singIn or no. If singIn, go to RoomsActivity;
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_singin);
+
+        loadSharPrefData();
 
         initialize();
         checkUserAuth();
@@ -58,10 +73,12 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                 .build();
 
 
+        // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+                .addApi(AppIndex.API).build();
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
@@ -108,6 +125,18 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+    }
+
+    private void loadSharPrefData() {
+        mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+
+        if (mSharedPreferences.contains(APP_PREFERENCES_BACKGROUND_ID)) {
+            SingletonCM.getInstance().setBackgroundID(mSharedPreferences.getInt(APP_PREFERENCES_BACKGROUND_ID, 0));
+            Log.d(TAG, "Data is load");
+            Toast.makeText(SingInActivity.this, "Data is load",
+                    Toast.LENGTH_SHORT).show();
+        } else Log.d(TAG, "Data load faild");
 
     }
 
@@ -162,5 +191,45 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Toast.makeText(this, "Google Services Error", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("SingIn Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        mGoogleApiClient.connect();
+        AppIndex.AppIndexApi.start(mGoogleApiClient, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(mGoogleApiClient, getIndexApiAction());
+        mGoogleApiClient.disconnect();
+    }
+
+    public static void killApp() {
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 }

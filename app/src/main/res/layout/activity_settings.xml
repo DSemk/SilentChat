@@ -16,47 +16,70 @@
             android:text="Выбрать фон для чата"
             android:layout_marginTop="16dp"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_below="@+id/textView"
             android:layout_alignParentStart="true">
 
 
             <ImageView
                 android:layout_width="110dp"
                 android:layout_height="90dp"
-                app:srcCompat="@drawable/back_1_ltl"
+                app:srcCompat="@drawable/back_1"
                 android:id="@+id/image_back1"
+                android:scaleType="centerCrop"
                 android:layout_marginTop="39dp"
                 android:layout_alignParentStart="true" />
 
             <ImageView
                 android:layout_width="110dp"
                 android:layout_height="90dp"
-                app:srcCompat="@drawable/back_2_ltl"
+                app:srcCompat="@drawable/back_2"
                 android:id="@+id/image_back2"
                 android:layout_below="@+id/image_back1"
                 android:layout_alignParentStart="true"
+                android:scaleType="centerCrop"
                 android:layout_marginTop="20dp" />
 
             <ImageView
                 android:layout_width="110dp"
                 android:layout_height="90dp"
-                app:srcCompat="@drawable/back_3_ltl"
+                app:srcCompat="@drawable/back_3"
                 android:id="@+id/image_back3"
+                android:scaleType="centerCrop"
                 android:layout_alignTop="@+id/image_back4"
                 android:layout_alignParentEnd="true" />
 
             <ImageView
                 android:layout_width="110dp"
                 android:layout_height="90dp"
-                app:srcCompat="@drawable/back_4_ltl"
+                app:srcCompat="@drawable/back_4"
                 android:id="@+id/image_back4"
+                android:scaleType="centerCrop"
                 android:layout_alignTop="@+id/image_back1"
                 android:layout_centerHorizontal="true" />
+
+            <ImageView
+                android:layout_width="110dp"
+                android:layout_height="90dp"
+                app:srcCompat="@drawable/back_6"
+                android:id="@+id/image_back6"
+                android:scaleType="centerCrop"
+                android:layout_alignTop="@+id/image_back2"
+                android:layout_alignParentEnd="true" />
+
+            <ImageView
+                android:layout_width="110dp"
+                android:layout_height="90dp"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/back_5"
+                android:id="@+id/image_back5"
+                android:layout_alignTop="@+id/image_back2"
+                android:layout_alignStart="@+id/image_back4" />
 
         </RelativeLayout>
 

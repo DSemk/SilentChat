@@ -1,10 +1,13 @@
 package com.example.disemk.silentchat;
 
+import android.content.SharedPreferences;
+
 /**
  * Created by icoper on 26.01.17.
  */
 
 public class SingletonCM {
+
     private static SingletonCM ourInstance = new SingletonCM();
 
     public static SingletonCM getInstance() {
@@ -23,4 +26,6 @@ public class SingletonCM {
     public void setBackgroundID(int backgroundID) {
         this.backgroundID = backgroundID;
     }
+
+
 }

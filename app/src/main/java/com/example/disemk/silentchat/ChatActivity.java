@@ -1,6 +1,7 @@
 package com.example.disemk.silentchat;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -31,6 +32,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String CHILD_TREE = "massages";
+    public static final String APP_PREFERENCES = "mysettings_silent";
+    public static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
+
+    private SharedPreferences mSharedPreferences;
     private String romName;
     private int msgLayout;
 
@@ -59,7 +64,7 @@ public class ChatActivity extends AppCompatActivity {
 
         romName = getIntent().getStringExtra("userRoom");
         setTitle("Комната : " + romName);
-
+        setBackground();
         initialize();
 
     }
