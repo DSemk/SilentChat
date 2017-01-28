@@ -1,36 +1,30 @@
-package com.example.disemk.silentchat;
+package com.example.disemk.silentchat.fragments;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
-import com.example.disemk.silentchat.models.ChatRoom;
+import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.SingletonCM;
 
 /**
  * Created by icoper on 26.01.17.
  */
 
-public class SettingsActivity extends AppCompatActivity {
-    public static final String APP_PREFERENCES = "mysettings_silent";
-    public static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
+public class SettingsFragment extends Fragment {
 
+    private static final String APP_PREFERENCES = "silent_pref";
+    private static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
     private SharedPreferences mSharedPreferences;
+    private Context context;
 
     private ImageView backgroundOne;
     private ImageView backgroundSecond;
@@ -40,37 +34,22 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageView backgroundSix;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-        setTitle(R.string.main_title_ru);
-
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-
-        initializeItem();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_settings,container,false);
+        context = SingletonCM.getInstance().getMainContext();
+        initializeItem(view);
+        return view;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
-    private void initializeItem() {
-        backgroundOne = (ImageView) findViewById(R.id.image_back1);
-        backgroundSecond = (ImageView) findViewById(R.id.image_back2);
-        backgroundThird = (ImageView) findViewById(R.id.image_back3);
-        backgroundFour = (ImageView) findViewById(R.id.image_back4);
-        backgroundFive = (ImageView) findViewById(R.id.image_back5);
-        backgroundSix = (ImageView) findViewById(R.id.image_back6);
+
+    private void initializeItem(View container) {
+        backgroundOne = (ImageView) container.findViewById(R.id.image_back1);
+        backgroundSecond = (ImageView)container. findViewById(R.id.image_back2);
+        backgroundThird = (ImageView) container.findViewById(R.id.image_back3);
+        backgroundFour = (ImageView) container.findViewById(R.id.image_back4);
+        backgroundFive = (ImageView) container.findViewById(R.id.image_back5);
+        backgroundSix = (ImageView)container. findViewById(R.id.image_back6);
 
 
         View.OnClickListener mOnClickListener = new View.OnClickListener() {
@@ -117,24 +96,24 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void saveStateBackground(int backId) {
-        mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+
+        mSharedPreferences = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putInt(APP_PREFERENCES_BACKGROUND_ID, backId);
         editor.apply();
     }
 
     private void restartAppDialog() {
-        LayoutInflater layoutInflater = LayoutInflater.from(SettingsActivity.this);
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.alert_dialog_savestate, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(view);
 
         builder.setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplication(), "Применено", Toast.LENGTH_SHORT).show();
                     }
                 });
 

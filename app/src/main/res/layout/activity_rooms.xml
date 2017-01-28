@@ -10,12 +10,13 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.disemk.silentchat.RoomsActivity">
+    tools:context="com.example.disemk.silentchat.fragments.RoomsFragment">
 
     <ProgressBar
         android:id="@+id/ar_progressBar"
-        style="?android:attr/progressBarStyleLarge"
+        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
+        android:backgroundTint="@color/blue"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
@@ -40,12 +41,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:src="@drawable/basic_plus_icon"
+            android:src="@drawable/ic_add_white_36dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
+            app:backgroundTint="@color/blue"
             android:layout_margin="@dimen/fab_margin"
             android:layout_gravity="right|end|top" />
     </RelativeLayout>
-
 
 </RelativeLayout>

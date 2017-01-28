@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_found"
+            android:icon="@drawable/ic_search_black_36dp"
+            android:title="Найти чат" />
+        <item
+            android:id="@+id/nav_favorite"
+            android:icon="@drawable/ic_grade_black_36dp"
+            android:title="Избранное"></item>
+        <item
+            android:id="@+id/nav_all_chats"
+            android:icon="@drawable/ic_group_black_36dp"
+            android:title="Все чаты" />
+    </group>
+
+    <item android:title="Прочее">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings_black_36dp"
+                android:title="Настройки" />
+            <item
+                android:id="@+id/nav_exit"
+                android:icon="@drawable/ic_exit_to_app_black_36dp"
+                android:title="Выход" />
+        </menu>
+    </item>
+
+</menu>

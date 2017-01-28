@@ -3,6 +3,7 @@ package com.example.disemk.silentchat;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,7 +21,6 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.auth.api.signin.SignInAccount;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,8 +39,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class SingInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "SingInActivity";
-    public static final String APP_PREFERENCES = "mysettings_silent";
-    public static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
+    private static final String APP_PREFERENCES = "silent_pref";
+    private static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
+    ;
 
     private SharedPreferences mSharedPreferences;
     private GoogleApiClient mGoogleApiClient;
@@ -55,7 +56,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     /**
      * @metod - loadSharPrefData() - load user settings chenges;
      * @metod initialize() - init all items & all ;
-     * @metod checkUserAuth() - check user is already singIn or no. If singIn, go to RoomsActivity;
+     * @metod checkUserAuth() - check user is already singIn or no. If singIn, go to RoomsFragment;
      */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,6 +88,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 mFirebaseUser = firebaseAuth.getCurrentUser();
                 if (mFirebaseUser != null) {
+                    saveFBaseUserInfo();
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + mFirebaseUser.getUid());
                 } else {
                     // User is signed out
@@ -100,9 +102,9 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     // Check you are a new user,or not.
     private void checkUserAuth() {
         if (mFirebaseUser != null) {
-            startActivity(new Intent(SingInActivity.this, RoomsActivity.class));
+            saveFBaseUserInfo();
+            startActivity(new Intent(SingInActivity.this, MainActivity.class));
             finish();
-            Toast.makeText(SingInActivity.this, "Auth. is success!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -118,10 +120,8 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                 } else {
                     Toast.makeText(SingInActivity.this, "Сначала приймите правила лиц. соглашения", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
-
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
@@ -129,13 +129,15 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private void loadSharPrefData() {
-        mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        try {
+            mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        } catch (Resources.NotFoundException e) {
+            SingletonCM.getInstance().setBackgroundID(R.drawable.back_4);
+        }
 
         if (mSharedPreferences.contains(APP_PREFERENCES_BACKGROUND_ID)) {
             SingletonCM.getInstance().setBackgroundID(mSharedPreferences.getInt(APP_PREFERENCES_BACKGROUND_ID, 0));
             Log.d(TAG, "Data is load");
-            Toast.makeText(SingInActivity.this, "Data is load",
-                    Toast.LENGTH_SHORT).show();
         } else Log.d(TAG, "Data load faild");
 
     }
@@ -180,12 +182,18 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                             Toast.makeText(SingInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            startActivity(new Intent(SingInActivity.this, RoomsActivity.class));
+                            startActivity(new Intent(SingInActivity.this, MainActivity.class));
                             finish();
                         }
 
                     }
                 });
+    }
+
+    private void saveFBaseUserInfo() {
+        SingletonCM.getInstance().
+                setUserName(mFirebaseAuth.getCurrentUser().getDisplayName());
+        SingletonCM.getInstance().setUserIcon(mFirebaseUser.getPhotoUrl().toString());
     }
 
     @Override
@@ -229,7 +237,4 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
         mGoogleApiClient.disconnect();
     }
 
-    public static void killApp() {
-        android.os.Process.killProcess(android.os.Process.myPid());
-    }
 }

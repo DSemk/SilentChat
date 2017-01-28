@@ -17,6 +17,7 @@
             android:id="@+id/userImageView"
             android:layout_width="36dp"
             android:layout_height="36dp"
+            android:layout_gravity="center_vertical"
             android:src="@drawable/ic_account_circle_black_36dp" />
 
         <LinearLayout

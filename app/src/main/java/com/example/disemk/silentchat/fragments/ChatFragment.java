@@ -1,19 +1,14 @@
-package com.example.disemk.silentchat;
+package com.example.disemk.silentchat.fragments;
 
-import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -21,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.SingletonCM;
 import com.example.disemk.silentchat.models.ChatMessage;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,11 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatFragment extends android.app.Fragment{
     private static final String CHILD_TREE = "massages";
     public static final String APP_PREFERENCES = "mysettings_silent";
     public static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
 
+    private Context context;
     private SharedPreferences mSharedPreferences;
     private String romName;
     private int msgLayout;
@@ -54,56 +52,42 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mMsgEText;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_chat,container,false);
 
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        romName = SingletonCM.getInstance().getUserRoom();
+        context = SingletonCM.getInstance().getMainContext();
+        setBackground(view);
+        initialize(view);
 
-        romName = getIntent().getStringExtra("userRoom");
-        setTitle("Комната : " + romName);
-        setBackground();
-        initialize();
-
+        return view;
     }
 
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                //Write your logic here
-                this.finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     // init all components
-    private void initialize() {
+    private void initialize(View container) {
+
         msgLayout = R.layout.chat_message;
 
-        mMsgEText = (EditText) findViewById(R.id.msgEditText);
-        mSendButtn = (Button) findViewById(R.id.sendButton);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mMsgEText = (EditText) container.findViewById(R.id.msgEditText);
+        mSendButtn = (Button) container.findViewById(R.id.sendButton);
+        mProgressBar = (ProgressBar) container.findViewById(R.id.progressBar);
         mProgressBar.setVisibility(ProgressBar.VISIBLE);
 
-        mMsgRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
+        mMsgRecyclerView = (RecyclerView) container.findViewById(R.id.messageRecyclerView);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(context);
         mLayoutManager.setStackFromEnd(true);
         mMsgRecyclerView.setLayoutManager(mLayoutManager);
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         setmFBAdapterUn();
-        setBackground();
+        setBackground(container);
 
         mSendButtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
                     mDatabaseReference.child(romName).push().setValue(frendlyMsg);
                     mMsgEText.setText("");
                 } else {
-                    Toast.makeText(getApplicationContext(), "Enter msg first!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Enter msg first!", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -155,24 +139,17 @@ public class ChatActivity extends AppCompatActivity {
             protected void populateViewHolder(FirechatMsgViewHolder firechatMsgViewHolder, ChatMessage chatMessage, int i) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
-//                if(mFirebaseUser.getDisplayName().equals(chatMessage.getName())){
-//                    mLayoutManager.setOrientation(Gravity.RIGHT);
-//                }
-//                else {
-//                    mLayoutManager.setOrientation(Gravity.LEFT);
-//                }
-
                 firechatMsgViewHolder.msgText.setText(chatMessage.getText());
                 firechatMsgViewHolder.userText.setText(chatMessage.getName());
 
 
                 if (mFirebaseUser.getPhotoUrl() == null) {
                     firechatMsgViewHolder.userImage.setImageDrawable(
-                            ContextCompat.getDrawable(ChatActivity.this, R.drawable.ic_account_circle_black_36dp));
+                            ContextCompat.getDrawable(context, R.drawable.ic_account_circle_black_36dp));
                 } else {
                     mUsername = mFirebaseUser.getDisplayName();
                     mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
-                    Glide.with(ChatActivity.this).
+                    Glide.with(ChatFragment.this).
                             load(chatMessage.getPhotoUrl()).into(firechatMsgViewHolder.userImage);
                 }
             }
@@ -210,8 +187,8 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void setBackground() {
-        RecyclerView view = (RecyclerView) findViewById(R.id.messageRecyclerView);
+    private void setBackground(View container) {
+        RecyclerView view = (RecyclerView) container.findViewById(R.id.messageRecyclerView);
         int id = SingletonCM.getInstance().getBackgroundID();
         if (id != 0) {
             view.setBackgroundResource(id);
