@@ -14,12 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.disemk.silentchat.MainActivity;
 import com.example.disemk.silentchat.R;
 import com.example.disemk.silentchat.SingletonCM;
+import com.example.disemk.silentchat.activitys.MainActivity;
 import com.example.disemk.silentchat.models.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -30,7 +32,7 @@ public class RoomsFragment extends android.app.Fragment {
     private static final String CHILD_THREE = "all rooms";
     private static final String APP_PREFERENCES = "silent_pref";
     private static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
-
+    private String userFilterText;
     private ChatFragment chatFragment;
     private SharedPreferences mSharedPreferences;
     private FragmentTransaction fragmentTransaction;
@@ -54,6 +56,15 @@ public class RoomsFragment extends android.app.Fragment {
     }
 
     private void initialize(View container) {
+        try {
+            userFilterText = "";
+            if (!SingletonCM.getInstance().getUserFilterRoom().isEmpty()) {
+                userFilterText = SingletonCM.getInstance().getUserFilterRoom();
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
         chatFragment = new ChatFragment();
 
         mProgressBar = (ProgressBar) container.findViewById(R.id.ar_progressBar);
@@ -63,6 +74,7 @@ public class RoomsFragment extends android.app.Fragment {
         mLinerLayoutManager = new LinearLayoutManager(context.getApplicationContext());
         mLinerLayoutManager.setStackFromEnd(true);
         mRoomRecyclerView.setLayoutManager(mLinerLayoutManager);
+
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<ChatRoom, FireChatRoomViewHolder>(
@@ -74,13 +86,25 @@ public class RoomsFragment extends android.app.Fragment {
             @Override
             protected void populateViewHolder(final FireChatRoomViewHolder viewHolder, ChatRoom model, final int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                viewHolder.roomNameText.setText(model.getRoomName());
-                viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onItemClickCustom(viewHolder);
-                    }
-                });
+                if (userFilterText.isEmpty()) {
+                    viewHolder.roomNameText.setText(model.getRoomName());
+                    viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onItemClickCustom(viewHolder);
+                        }
+                    });
+                } else if (model.getRoomName().contains(userFilterText)) {
+                    viewHolder.roomNameText.setText(model.getRoomName());
+                    viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onItemClickCustom(viewHolder);
+                        }
+                    });
+                } else {
+                    viewHolder.roomNameText.setVisibility(View.GONE);
+                }
             }
         };
 
@@ -113,21 +137,16 @@ public class RoomsFragment extends android.app.Fragment {
     private void onItemClickCustom(FireChatRoomViewHolder viewHolder) {
         SingletonCM.getInstance().setUserRoom(viewHolder.roomNameText.getText().toString());
         fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.ma_container,chatFragment);
+        fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
         fragmentTransaction.commit();
     }
     private void addNewRoom(Context context) {
-
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.room_add_new, null);
-
-
         AlertDialog.Builder builder = new AlertDialog
                 .Builder(new ContextThemeWrapper(context, R.style.myDialog));
-
         builder.setView(view);
         final EditText editName = (EditText) view.findViewById(R.id.ad_addNewRoom_et);
-
         builder.setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
@@ -139,7 +158,7 @@ public class RoomsFragment extends android.app.Fragment {
                             mDatabaseReference.child(CHILD_THREE).push().setValue(newRoom);
                             SingletonCM.getInstance().setUserRoom(userRoomName);
                             fragmentTransaction = getFragmentManager().beginTransaction();
-                            fragmentTransaction.replace(R.id.ma_container,chatFragment);
+                            fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
                             fragmentTransaction.commit();
                         }
                     }
@@ -153,8 +172,19 @@ public class RoomsFragment extends android.app.Fragment {
         AlertDialog alertDialog = builder.create();
         alertDialog.setTitle("Введите название комнаты");
         alertDialog.show();
+    }
 
 
+    private void setFilter(String name) {
+
+    }
+
+    private void setBackground(View view) {
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.roomRecyclerView);
+        int id = SingletonCM.getInstance().getBackgroundID();
+        if (id != 0) {
+            recyclerView.setBackgroundResource(id);
+        }
     }
 
     public static class FireChatRoomViewHolder extends RecyclerView.ViewHolder {
@@ -168,13 +198,5 @@ public class RoomsFragment extends android.app.Fragment {
         }
     }
 
-    private void setBackground(View view) {
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.roomRecyclerView);
-        int id = SingletonCM.getInstance().getBackgroundID();
-        if (id != 0) {
-            recyclerView.setBackgroundResource(id);
-        }
-
-    }
 
 }

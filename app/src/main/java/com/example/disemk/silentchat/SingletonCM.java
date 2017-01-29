@@ -23,6 +23,15 @@ public class SingletonCM {
     private String userRoom;
     private String userName;
     private String userIcon;
+    private String userFilterRoom;
+
+    public String getUserFilterRoom() {
+        return userFilterRoom;
+    }
+
+    public void setUserFilterRoom(String userFilterRoom) {
+        this.userFilterRoom = userFilterRoom;
+    }
 
     public String getUserName() {
         return userName;

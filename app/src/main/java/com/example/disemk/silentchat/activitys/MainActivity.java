@@ -1,17 +1,16 @@
-package com.example.disemk.silentchat;
+package com.example.disemk.silentchat.activitys;
 
-import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,19 +18,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.SingletonCM;
 import com.example.disemk.silentchat.fragments.ChatFragment;
 import com.example.disemk.silentchat.fragments.RoomsFragment;
 import com.example.disemk.silentchat.fragments.SettingsFragment;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.example.disemk.silentchat.models.ChatRoom;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,17 +55,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         setTitle(APP_TITLE_NAME);
 
-//        Intent intent = getIntent();
-//        // status == true, in first launch app on device
-//        boolean status = intent.getBooleanExtra("status",false);
-//        if (status){
-//            android.os.Process.killProcess(android.os.Process.myPid());
-//            Log.d("MainActivity","-----------------------------------------------=Restart");
-//        }
-
         initialize();
         transaction = getFragmentManager().beginTransaction();
-        transaction.add(R.id.ma_container, roomsFragment);
+        transaction.add(R.id.ma_container, roomsFragment).addToBackStack(null);
         transaction.commit();
         headNDrawerCustom();
 
@@ -88,8 +78,6 @@ public class MainActivity extends AppCompatActivity
         roomsFragment = new RoomsFragment();
         settingsFragment = new SettingsFragment();
         chatFragment = new ChatFragment();
-
-
     }
 
     // create custom elements for header navigation drawer
@@ -110,12 +98,73 @@ public class MainActivity extends AppCompatActivity
             Glide.with(MainActivity.this).
                     load(imgUrl).into(userIcon);
         }
-//        userIcon = (CircleImageView) hView.findViewById(R.id.nd_cap_user_icon);
-//        userName = (TextView) hView.findViewById(R.id.nd_cap_user_name);
-//        userName.setText(SingletonCM.getInstance().getUserName());
-//        new MyThread().execute(SingletonCM.getInstance().getUserIcon());
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.menu_main) {
+            createAlertDialog();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void createAlertDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        View view = layoutInflater.inflate(R.layout.alert_dialog_found_room, null);
+        AlertDialog.Builder builder = new AlertDialog
+                .Builder(new ContextThemeWrapper(MainActivity.this, R.style.myDialog));
+        builder.setView(view);
+        final EditText editName = (EditText) view.findViewById(R.id.ad_found_room_et);
+        builder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (!editName.getText().toString().isEmpty()) {
+                            SingletonCM.getInstance()
+                                    .setUserFilterRoom(editName.getText().toString());
+                            transaction = getFragmentManager().beginTransaction();
+                            transaction.remove(roomsFragment);
+                            transaction.commit();
+
+                            transaction = getFragmentManager().beginTransaction();
+                            transaction.add(R.id.ma_container, roomsFragment);
+                            transaction.commit();
+                        } else {
+                            Toast.makeText(
+                                    MainActivity.this, "Введите имя комнаты",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setTitle("Поиск комнаты");
+        alertDialog.show();
+    }
+
+
 
     @Override
     protected void onRestart() {
@@ -126,10 +175,13 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         if (back_pressed + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
-        } else {
-            Toast.makeText(getBaseContext(), "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show();
         }
         back_pressed = System.currentTimeMillis();
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
     }
 
 
@@ -144,9 +196,9 @@ public class MainActivity extends AppCompatActivity
             // Handle the camera action
             Toast.makeText(getApplicationContext(), "In Develop", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_all_chats) {
-            transaction.replace(R.id.ma_container, roomsFragment);
+            transaction.replace(R.id.ma_container, roomsFragment).addToBackStack(null);
         } else if (id == R.id.nav_settings) {
-            transaction.replace(R.id.ma_container, settingsFragment);
+            transaction.replace(R.id.ma_container, settingsFragment).addToBackStack(null);
         } else if (id == R.id.nav_exit) {
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -163,40 +215,5 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    class MyThread extends AsyncTask<String, Void, Bitmap> {
-
-
-        private static final String DEBUG_TAG = "my thread - >";
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            publishProgress(new Void[]{});
-
-            String url = "";
-            if (params.length > 0) {
-                url = params[0];
-            }
-
-            InputStream input = null;
-
-            try {
-                URL urlConn = new URL(url);
-                input = urlConn.openStream();
-            } catch (MalformedURLException e) {
-                Log.d(DEBUG_TAG, "Oops, Something wrong with URL...");
-                e.printStackTrace();
-            } catch (IOException e) {
-                Log.d(DEBUG_TAG, "Oops, Something wrong with inpur stream...");
-                e.printStackTrace();
-            }
-            return BitmapFactory.decodeStream(input);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            super.onPostExecute(result);
-            userIcon.setImageBitmap(result);
-        }
-    }
 
 }

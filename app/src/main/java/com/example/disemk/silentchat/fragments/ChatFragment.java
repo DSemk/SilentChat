@@ -127,10 +127,7 @@ public class ChatFragment extends android.app.Fragment {
         mMsgRecyclerView.setLayoutManager(mLayoutManager);
         mMsgRecyclerView.setAdapter(mFBAdapter);
 
-
     }
-
-    //TODO : If it's this user msg, use chat_message_my layout, else chat_message
 
     private void setmFBAdapterUn() {
 
@@ -199,16 +196,14 @@ public class ChatFragment extends android.app.Fragment {
 
         public FirechatMsgViewHolder(View view) {
             super(view);
-
             userImage = (CircleImageView) view.findViewById(R.id.user_msg_icon);
-
             userText = (TextView) itemView.findViewById(R.id.name_text);
             msgText = (TextView) itemView.findViewById(R.id.message_text);
             mLeftArrow = (FrameLayout) itemView.findViewById(R.id.left_arrow);
             mRightArrow = (FrameLayout) itemView.findViewById(R.id.right_arrow);
             mMessageContainer = (RelativeLayout) itemView.findViewById(R.id.message_container);
             mMessage = (LinearLayout) itemView.findViewById(R.id.message);
-            mGreen300 = ContextCompat.getColor(itemView.getContext(), R.color.material_green_300);
+            mGreen300 = ContextCompat.getColor(itemView.getContext(), R.color.material_blue_300);
             mGray300 = ContextCompat.getColor(itemView.getContext(), R.color.material_gray_300);
         }
 
@@ -233,6 +228,7 @@ public class ChatFragment extends android.app.Fragment {
                     .setColorFilter(color, PorterDuff.Mode.SRC);
         }
     }
+
 
     private void setBackground(View container) {
         RecyclerView view = (RecyclerView) container.findViewById(R.id.messageRecyclerView);
