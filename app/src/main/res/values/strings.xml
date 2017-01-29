@@ -20,6 +20,8 @@
         <item>Screen 2</item>
         <item>Screen 3</item>
     </string-array>
+    <string name="singInDialog_ru">Вход успешно выполнен.
+        Для окончания установки необходимо перезапустить приложение!</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

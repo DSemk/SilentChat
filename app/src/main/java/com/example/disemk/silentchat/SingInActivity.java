@@ -1,19 +1,26 @@
 package com.example.disemk.silentchat;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.disemk.silentchat.models.ChatRoom;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -63,10 +70,6 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_singin);
 
-        loadSharPrefData();
-
-        initialize();
-        checkUserAuth();
         // START config_singin
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -88,7 +91,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 mFirebaseUser = firebaseAuth.getCurrentUser();
                 if (mFirebaseUser != null) {
-                    saveFBaseUserInfo();
+                    pushFBaseUserInfo();
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + mFirebaseUser.getUid());
                 } else {
                     // User is signed out
@@ -97,13 +100,16 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             }
 
         };
+        initialize();
+        checkUserAuth();
+        loadSharPrefData();
     }
 
     // Check you are a new user,or not.
     private void checkUserAuth() {
         if (mFirebaseUser != null) {
-            saveFBaseUserInfo();
-            startActivity(new Intent(SingInActivity.this, MainActivity.class));
+            pushFBaseUserInfo();
+            startActivity(new Intent(SingInActivity.this, MainActivity.class).putExtra("status", false));
             finish();
         }
     }
@@ -182,18 +188,46 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                             Toast.makeText(SingInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            startActivity(new Intent(SingInActivity.this, MainActivity.class));
-                            finish();
+
+                            // status == true,use in first run app on devise
+                            showAlrtDialog();
                         }
 
                     }
                 });
     }
 
-    private void saveFBaseUserInfo() {
-        SingletonCM.getInstance().
-                setUserName(mFirebaseAuth.getCurrentUser().getDisplayName());
-        SingletonCM.getInstance().setUserIcon(mFirebaseUser.getPhotoUrl().toString());
+    private void showAlrtDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(SingInActivity.this);
+        View view = layoutInflater.inflate(R.layout.alert_dialog_singin, null);
+
+
+        AlertDialog.Builder builder = new AlertDialog
+                .Builder(new ContextThemeWrapper(SingInActivity.this, R.style.myDialog));
+
+        builder.setView(view);
+        final EditText editName = (EditText) view.findViewById(R.id.ad_addNewRoom_et);
+
+        builder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                    }
+                });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setTitle("Предупреждение!");
+        alertDialog.show();
+
+    }
+
+    private void pushFBaseUserInfo() {
+        if (mFirebaseAuth != null && mFirebaseUser != null) {
+            SingletonCM.getInstance().
+                    setUserName(mFirebaseAuth.getCurrentUser().getDisplayName());
+            SingletonCM.getInstance().setUserIcon(mFirebaseUser.getPhotoUrl().toString());
+        }
     }
 
     @Override

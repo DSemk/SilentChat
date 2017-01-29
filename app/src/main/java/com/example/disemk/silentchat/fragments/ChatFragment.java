@@ -2,16 +2,24 @@ package com.example.disemk.silentchat.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RotateDrawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatFragment extends android.app.Fragment{
+public class ChatFragment extends android.app.Fragment {
     private static final String CHILD_TREE = "massages";
     public static final String APP_PREFERENCES = "mysettings_silent";
     public static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
@@ -44,7 +52,6 @@ public class ChatFragment extends android.app.Fragment{
     private ProgressBar mProgressBar;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
-
     private String mUsername;
     private String mPhotoUrl;
 
@@ -53,7 +60,7 @@ public class ChatFragment extends android.app.Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_chat,container,false);
+        View view = inflater.inflate(R.layout.activity_chat, container, false);
 
         romName = SingletonCM.getInstance().getUserRoom();
         context = SingletonCM.getInstance().getMainContext();
@@ -62,7 +69,6 @@ public class ChatFragment extends android.app.Fragment{
 
         return view;
     }
-
 
 
     // init all components
@@ -130,7 +136,7 @@ public class ChatFragment extends android.app.Fragment{
 
         mFBAdapter = new FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder>(
                 ChatMessage.class,
-                R.layout.chat_message,
+                R.layout.message,
                 FirechatMsgViewHolder.class,
                 mDatabaseReference.child(romName)
         ) {
@@ -138,7 +144,11 @@ public class ChatFragment extends android.app.Fragment{
             @Override
             protected void populateViewHolder(FirechatMsgViewHolder firechatMsgViewHolder, ChatMessage chatMessage, int i) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-
+                if (chatMessage.getName().equals(mUsername)) {
+                    firechatMsgViewHolder.setIsSender(true);
+                } else {
+                    firechatMsgViewHolder.setIsSender(false);
+                }
                 firechatMsgViewHolder.msgText.setText(chatMessage.getText());
                 firechatMsgViewHolder.userText.setText(chatMessage.getName());
 
@@ -172,18 +182,55 @@ public class ChatFragment extends android.app.Fragment{
         mMsgRecyclerView.setAdapter(mFBAdapter);
 
         mUsername = mFirebaseUser.getDisplayName().toString();
+
+
     }
 
     public static class FirechatMsgViewHolder extends RecyclerView.ViewHolder {
         public TextView msgText;
         public TextView userText;
         public CircleImageView userImage;
+        private final FrameLayout mLeftArrow;
+        private final FrameLayout mRightArrow;
+        private final RelativeLayout mMessageContainer;
+        private final LinearLayout mMessage;
+        private final int mGreen300;
+        private final int mGray300;
 
         public FirechatMsgViewHolder(View view) {
             super(view);
-            msgText = (TextView) view.findViewById(R.id.msgTextView);
-            userText = (TextView) view.findViewById(R.id.userTextView);
-            userImage = (CircleImageView) view.findViewById(R.id.userImageView);
+
+            userImage = (CircleImageView) view.findViewById(R.id.user_msg_icon);
+
+            userText = (TextView) itemView.findViewById(R.id.name_text);
+            msgText = (TextView) itemView.findViewById(R.id.message_text);
+            mLeftArrow = (FrameLayout) itemView.findViewById(R.id.left_arrow);
+            mRightArrow = (FrameLayout) itemView.findViewById(R.id.right_arrow);
+            mMessageContainer = (RelativeLayout) itemView.findViewById(R.id.message_container);
+            mMessage = (LinearLayout) itemView.findViewById(R.id.message);
+            mGreen300 = ContextCompat.getColor(itemView.getContext(), R.color.material_green_300);
+            mGray300 = ContextCompat.getColor(itemView.getContext(), R.color.material_gray_300);
+        }
+
+        public void setIsSender(boolean isSender) {
+            final int color;
+            if (isSender) {
+                color = mGreen300;
+                mLeftArrow.setVisibility(View.GONE);
+                mRightArrow.setVisibility(View.VISIBLE);
+                mMessageContainer.setGravity(Gravity.END);
+            } else {
+                color = mGray300;
+                mLeftArrow.setVisibility(View.VISIBLE);
+                mRightArrow.setVisibility(View.GONE);
+                mMessageContainer.setGravity(Gravity.START);
+            }
+
+            ((GradientDrawable) mMessage.getBackground()).setColor(color);
+            ((RotateDrawable) mLeftArrow.getBackground()).getDrawable()
+                    .setColorFilter(color, PorterDuff.Mode.SRC);
+            ((RotateDrawable) mRightArrow.getBackground()).getDrawable()
+                    .setColorFilter(color, PorterDuff.Mode.SRC);
         }
     }
 

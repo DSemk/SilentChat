@@ -13,8 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/customborder"
-            android:paddingBottom="4dp"
-            android:paddingTop="4dp"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
             android:gravity="center_vertical"
             android:weightSum="1"
             android:layout_weight="1">
@@ -30,11 +30,12 @@
 
             <TextView
                 android:id="@+id/ar_roomName"
-                android:layout_width="333dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
                 android:textSize="16dp"
                 android:textColor="@color/colorRoomText"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
         </LinearLayout>

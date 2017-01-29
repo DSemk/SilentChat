@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/linearLayout"
+        android:background="@drawable/back_4"
         android:scaleType="centerCrop" />
 
     <LinearLayout
@@ -24,7 +25,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:background="@color/editMsgColor"
+        android:background="@drawable/customborder"
         android:orientation="horizontal">
 
         <EditText
@@ -36,9 +37,9 @@
 
         <Button
             android:id="@+id/sendButton"
-            android:layout_width="42dp"
+            android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|center_vertical"
             android:background="@drawable/ic_send_black_36dp" />
     </LinearLayout>
 

@@ -2,12 +2,15 @@ package com.example.disemk.silentchat;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -31,6 +34,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -50,6 +56,15 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle(APP_TITLE_NAME);
+
+//        Intent intent = getIntent();
+//        // status == true, in first launch app on device
+//        boolean status = intent.getBooleanExtra("status",false);
+//        if (status){
+//            android.os.Process.killProcess(android.os.Process.myPid());
+//            Log.d("MainActivity","-----------------------------------------------=Restart");
+//        }
+
         initialize();
         transaction = getFragmentManager().beginTransaction();
         transaction.add(R.id.ma_container, roomsFragment);
@@ -82,14 +97,29 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View hView = navigationView.getHeaderView(0);
-        userIcon = (CircleImageView) hView.findViewById(R.id.nd_cap_user_icon);
-        userName = (TextView) hView.findViewById(R.id.nd_cap_user_name);
 
-        userName.setText(SingletonCM.getInstance().getUserName().toString());
-        Glide.with(MainActivity.this).
-                load(SingletonCM.getInstance().getUserIcon()).into(userIcon);
+        if (!SingletonCM.getInstance().getUserIcon().isEmpty()
+                && !SingletonCM.getInstance().getUserName().isEmpty()) {
 
+            String imgUrl = SingletonCM.getInstance().getUserIcon().toString();
+            String userNameText = SingletonCM.getInstance().getUserName();
 
+            userIcon = (CircleImageView) hView.findViewById(R.id.nd_cap_user_icon);
+            userName = (TextView) hView.findViewById(R.id.nd_cap_user_name);
+            userName.setText(userNameText);
+            Glide.with(MainActivity.this).
+                    load(imgUrl).into(userIcon);
+        }
+//        userIcon = (CircleImageView) hView.findViewById(R.id.nd_cap_user_icon);
+//        userName = (TextView) hView.findViewById(R.id.nd_cap_user_name);
+//        userName.setText(SingletonCM.getInstance().getUserName());
+//        new MyThread().execute(SingletonCM.getInstance().getUserIcon());
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
     }
 
     @Override
@@ -131,6 +161,42 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    class MyThread extends AsyncTask<String, Void, Bitmap> {
+
+
+        private static final String DEBUG_TAG = "my thread - >";
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            publishProgress(new Void[]{});
+
+            String url = "";
+            if (params.length > 0) {
+                url = params[0];
+            }
+
+            InputStream input = null;
+
+            try {
+                URL urlConn = new URL(url);
+                input = urlConn.openStream();
+            } catch (MalformedURLException e) {
+                Log.d(DEBUG_TAG, "Oops, Something wrong with URL...");
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.d(DEBUG_TAG, "Oops, Something wrong with inpur stream...");
+                e.printStackTrace();
+            }
+            return BitmapFactory.decodeStream(input);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            super.onPostExecute(result);
+            userIcon.setImageBitmap(result);
+        }
     }
 
 }
