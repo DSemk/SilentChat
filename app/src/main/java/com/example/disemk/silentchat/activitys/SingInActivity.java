@@ -1,4 +1,4 @@
-package com.example.disemk.silentchat;
+package com.example.disemk.silentchat.activitys;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,7 +19,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.disemk.silentchat.activitys.MainActivity;
+import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.engine.SingletonCM;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;

@@ -1,7 +1,6 @@
-package com.example.disemk.silentchat;
+package com.example.disemk.silentchat.engine;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 /**
  * Created by icoper on 26.01.17.

@@ -4,13 +4,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@drawable/anonymous_app_icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SingInActivity"
+            android:name=".activitys.SingInActivity"
             android:title="@string/as_title_ru">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

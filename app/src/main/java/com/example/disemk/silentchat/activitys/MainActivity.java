@@ -2,13 +2,9 @@ package com.example.disemk.silentchat.activitys;
 
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -25,16 +21,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.disemk.silentchat.R;
-import com.example.disemk.silentchat.SingletonCM;
+import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.fragments.ChatFragment;
 import com.example.disemk.silentchat.fragments.RoomsFragment;
 import com.example.disemk.silentchat.fragments.SettingsFragment;
-import com.example.disemk.silentchat.models.ChatRoom;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -57,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
         initialize();
         transaction = getFragmentManager().beginTransaction();
-        transaction.add(R.id.ma_container, roomsFragment).addToBackStack(null);
+        transaction.add(R.id.ma_container, roomsFragment);
         transaction.commit();
         headNDrawerCustom();
 
@@ -191,21 +181,14 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         transaction = getFragmentManager().beginTransaction();
-
         if (id == R.id.nav_found) {
-            // Handle the camera action
-            Toast.makeText(getApplicationContext(), "In Develop", Toast.LENGTH_SHORT).show();
+            createAlertDialog();
         } else if (id == R.id.nav_all_chats) {
+            transaction.remove(roomsFragment);
+//            transaction.commit();
             transaction.replace(R.id.ma_container, roomsFragment).addToBackStack(null);
         } else if (id == R.id.nav_settings) {
             transaction.replace(R.id.ma_container, settingsFragment).addToBackStack(null);
-        } else if (id == R.id.nav_exit) {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            } else {
-                MainActivity.this.finish();
-            }
         } else if (id == R.id.nav_favorite) {
             Toast.makeText(getApplicationContext(), "In Develop", Toast.LENGTH_SHORT).show();
         }

@@ -10,10 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.disemk.silentchat.R;
-import com.example.disemk.silentchat.SingletonCM;
+import com.example.disemk.silentchat.engine.SingletonCM;
 
 /**
  * Created by icoper on 26.01.17.

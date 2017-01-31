@@ -14,14 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.disemk.silentchat.R;
-import com.example.disemk.silentchat.SingletonCM;
-import com.example.disemk.silentchat.activitys.MainActivity;
+import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.models.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -37,6 +34,7 @@ public class RoomsFragment extends android.app.Fragment {
     private SharedPreferences mSharedPreferences;
     private FragmentTransaction fragmentTransaction;
     public String userRoomName;
+    private static RoomsFragment roomsInstanse = new RoomsFragment();
 
     private DatabaseReference mDatabaseReference;
     private FirebaseRecyclerAdapter<ChatRoom, FireChatRoomViewHolder> mFirebaseRecyclerAdapter;
@@ -56,6 +54,7 @@ public class RoomsFragment extends android.app.Fragment {
     }
 
     private void initialize(View container) {
+        // it's use when user input name for found room
         try {
             userFilterText = "";
             if (!SingletonCM.getInstance().getUserFilterRoom().isEmpty()) {
@@ -68,7 +67,7 @@ public class RoomsFragment extends android.app.Fragment {
         chatFragment = new ChatFragment();
 
         mProgressBar = (ProgressBar) container.findViewById(R.id.ar_progressBar);
-        mRoomRecyclerView = (RecyclerView)container.findViewById(R.id.roomRecyclerView);
+        mRoomRecyclerView = (RecyclerView) container.findViewById(R.id.roomRecyclerView);
         mAddRoom = (FloatingActionButton) container.findViewById(R.id.ar_addRoom);
 
         mLinerLayoutManager = new LinearLayoutManager(context.getApplicationContext());
@@ -140,7 +139,8 @@ public class RoomsFragment extends android.app.Fragment {
         fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
         fragmentTransaction.commit();
     }
-    private void addNewRoom(Context context) {
+
+    public void addNewRoom(Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.room_add_new, null);
         AlertDialog.Builder builder = new AlertDialog
@@ -174,7 +174,6 @@ public class RoomsFragment extends android.app.Fragment {
         alertDialog.show();
     }
 
-
     private void setFilter(String name) {
 
     }
@@ -185,6 +184,10 @@ public class RoomsFragment extends android.app.Fragment {
         if (id != 0) {
             recyclerView.setBackgroundResource(id);
         }
+    }
+
+    public static RoomsFragment getRoomsInstanse() {
+        return roomsInstanse;
     }
 
     public static class FireChatRoomViewHolder extends RecyclerView.ViewHolder {
