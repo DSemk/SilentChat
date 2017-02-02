@@ -9,4 +9,5 @@
     <color name="editMsgColor">#b6484848</color>
     <color name="material_gray_300">#E0E0E0</color>
     <color name="material_blue_300">#70b9fd</color>
+    <color name="material_white_300">#FFF</color>
 </resources>

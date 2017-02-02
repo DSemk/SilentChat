@@ -2,6 +2,7 @@ package com.example.disemk.silentchat.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RotateDrawable;
@@ -210,6 +211,7 @@ public class ChatFragment extends android.app.Fragment {
             final int color;
             if (isSender) {
                 color = mGreen300;
+                msgText.setTextColor(Color.WHITE);
                 mLeftArrow.setVisibility(View.GONE);
                 mRightArrow.setVisibility(View.VISIBLE);
                 mMessageContainer.setGravity(Gravity.END);

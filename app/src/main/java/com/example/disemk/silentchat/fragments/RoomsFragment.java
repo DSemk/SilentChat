@@ -16,13 +16,18 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.activitys.MainActivity;
 import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.models.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RoomsFragment extends android.app.Fragment {
     private Context context;
@@ -45,7 +50,7 @@ public class RoomsFragment extends android.app.Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_rooms,container,false);
+        View view = inflater.inflate(R.layout.activity_rooms, container, false);
 
         context = SingletonCM.getInstance().getMainContext();
         initialize(view);
@@ -53,7 +58,7 @@ public class RoomsFragment extends android.app.Fragment {
         return view;
     }
 
-    private void initialize(View container) {
+    private void initialize(final View container) {
         // it's use when user input name for found room
         try {
             userFilterText = "";
@@ -85,12 +90,20 @@ public class RoomsFragment extends android.app.Fragment {
             @Override
             protected void populateViewHolder(final FireChatRoomViewHolder viewHolder, ChatRoom model, final int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                String imgUrl = SingletonCM.getInstance().getUserIcon().toString();
                 if (userFilterText.isEmpty()) {
                     viewHolder.roomNameText.setText(model.getRoomName());
                     viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            onItemClickCustom(viewHolder);
+                            onItemClickCustom(viewHolder, false);
+                        }
+                    });
+                    viewHolder.roomNameText.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            onItemClickCustom(viewHolder, true);
+                            return false;
                         }
                     });
                 } else if (model.getRoomName().contains(userFilterText)) {
@@ -98,7 +111,14 @@ public class RoomsFragment extends android.app.Fragment {
                     viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            onItemClickCustom(viewHolder);
+                            onItemClickCustom(viewHolder, false);
+                        }
+                    });
+                    viewHolder.roomNameText.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            onItemClickCustom(viewHolder, true);
+                            return false;
                         }
                     });
                 } else {
@@ -121,7 +141,6 @@ public class RoomsFragment extends android.app.Fragment {
 
         });
 
-
         mRoomRecyclerView.setLayoutManager(mLinerLayoutManager);
         mRoomRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
 
@@ -133,12 +152,24 @@ public class RoomsFragment extends android.app.Fragment {
         });
     }
 
-    private void onItemClickCustom(FireChatRoomViewHolder viewHolder) {
-        SingletonCM.getInstance().setUserRoom(viewHolder.roomNameText.getText().toString());
-        fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
-        fragmentTransaction.commit();
+    /**
+     * @param viewHolder - you know ;)
+     * @param type       - use false if onClick, or true if OnLongClick
+     */
+    private void onItemClickCustom(FireChatRoomViewHolder viewHolder, boolean type) {
+
+        if (type) {
+            Toast.makeText(context, "long tap", Toast.LENGTH_SHORT).show();
+        } else {
+            SingletonCM.getInstance().setUserRoom(viewHolder.roomNameText.getText().toString());
+            fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+
+
     }
+
 
     public void addNewRoom(Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
@@ -174,10 +205,6 @@ public class RoomsFragment extends android.app.Fragment {
         alertDialog.show();
     }
 
-    private void setFilter(String name) {
-
-    }
-
     private void setBackground(View view) {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.roomRecyclerView);
         int id = SingletonCM.getInstance().getBackgroundID();
@@ -192,10 +219,12 @@ public class RoomsFragment extends android.app.Fragment {
 
     public static class FireChatRoomViewHolder extends RecyclerView.ViewHolder {
         public TextView roomNameText;
+        public CircleImageView circleImageView;
 //        public TextView userRoomCountText;
 
         public FireChatRoomViewHolder(View view) {
             super(view);
+            circleImageView = (CircleImageView) view.findViewById(R.id.ar_roomIcon);
             roomNameText = (TextView) view.findViewById(R.id.ar_roomName);
 //            userRoomCountText = (TextView) view.findViewById(R.id.ar_userCount);
         }

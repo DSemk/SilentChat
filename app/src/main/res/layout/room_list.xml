@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -12,31 +11,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="@drawable/customborder"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
+            android:baselineAligned="false"
             android:gravity="center_vertical"
-            android:weightSum="1"
-            android:layout_weight="1">
+            android:orientation="horizontal"
+            android:padding="1dp"
+            android:weightSum="1">
 
-            <!--<ImageView-->
-            <!--android:layout_width="36dp"-->
-            <!--android:layout_height="36dp"-->
-            <!--android:padding="16dp"-->
-            <!--android:paddingLeft="16dp"-->
-            <!--android:background="@drawable/ic_room_icon_36dp"-->
-            <!--android:id="@+id/imageView"-->
-            <!--android:layout_weight="0.64" />-->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/ar_roomIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/ic_group_black_36dp"
+                android:padding="16dp"
+                android:paddingLeft="16dp"
+                android:scaleType="centerCrop" />
 
             <TextView
                 android:id="@+id/ar_roomName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:textSize="16dp"
+                android:padding="2dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/colorRoomText"
-                android:padding="4dp"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textSize="24dp" />
 
         </LinearLayout>
 
