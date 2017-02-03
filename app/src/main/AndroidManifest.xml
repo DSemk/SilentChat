@@ -13,10 +13,7 @@
         <activity
             android:name=".activitys.SingInActivity"
             android:title="@string/as_title_ru">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
 
         <meta-data
@@ -27,6 +24,16 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar"
             ></activity>
+        <activity
+            android:name=".activitys.SplashActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

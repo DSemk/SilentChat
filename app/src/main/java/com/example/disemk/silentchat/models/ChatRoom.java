@@ -8,12 +8,22 @@ import java.util.List;
 
 public class ChatRoom {
     String roomName;
+    String roomKey;
 
     public ChatRoom() {
     }
 
-    public ChatRoom(String roomName) {
+    public ChatRoom(String roomName, String roomKey) {
         this.roomName = roomName;
+        this.roomKey = roomKey;
+    }
+
+    public String getRoomKey() {
+        return roomKey;
+    }
+
+    public void setRoomKey(String roomKey) {
+        this.roomKey = roomKey;
     }
 
     public String getRoomName() {

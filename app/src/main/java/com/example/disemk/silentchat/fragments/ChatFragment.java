@@ -92,6 +92,7 @@ public class ChatFragment extends android.app.Fragment {
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
+        SingletonCM.getInstance();
         setmFBAdapterUn();
         setBackground(container);
 
@@ -130,6 +131,7 @@ public class ChatFragment extends android.app.Fragment {
     }
 
     private void setmFBAdapterUn() {
+        mProgressBar.setVisibility(View.GONE);
 
         mFBAdapter = new FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder>(
                 ChatMessage.class,
@@ -141,7 +143,9 @@ public class ChatFragment extends android.app.Fragment {
             @Override
             protected void populateViewHolder(FirechatMsgViewHolder firechatMsgViewHolder, ChatMessage chatMessage, int i) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                if (chatMessage.getName().equals(mUsername)) {
+
+                if (chatMessage.getName().equals(mUsername)
+                        && SingletonCM.getInstance().getUserIcon().equals(mPhotoUrl)) {
                     firechatMsgViewHolder.setIsSender(true);
                 } else {
                     firechatMsgViewHolder.setIsSender(false);
@@ -149,11 +153,14 @@ public class ChatFragment extends android.app.Fragment {
                 firechatMsgViewHolder.msgText.setText(chatMessage.getText());
                 firechatMsgViewHolder.userText.setText(chatMessage.getName());
 
-
                 if (mFirebaseUser.getPhotoUrl() == null) {
-                    firechatMsgViewHolder.userImage.setImageDrawable(
-                            ContextCompat.getDrawable(context, R.drawable.ic_account_circle_black_36dp));
+                    Glide.with(ChatFragment.this).
+                            load(SingletonCM
+                                    .getInstance()
+                                    .getUserIcon())
+                            .into(firechatMsgViewHolder.userImage);
                 } else {
+
                     mUsername = mFirebaseUser.getDisplayName();
                     mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
                     Glide.with(ChatFragment.this).

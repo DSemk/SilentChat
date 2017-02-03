@@ -14,7 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,8 +27,11 @@ import com.example.disemk.silentchat.activitys.MainActivity;
 import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.models.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -39,6 +45,7 @@ public class RoomsFragment extends android.app.Fragment {
     private SharedPreferences mSharedPreferences;
     private FragmentTransaction fragmentTransaction;
     public String userRoomName;
+    public String roomKey;
     private static RoomsFragment roomsInstanse = new RoomsFragment();
 
     private DatabaseReference mDatabaseReference;
@@ -88,41 +95,31 @@ public class RoomsFragment extends android.app.Fragment {
                 mDatabaseReference.child(CHILD_THREE)
         ) {
             @Override
-            protected void populateViewHolder(final FireChatRoomViewHolder viewHolder, ChatRoom model, final int position) {
+            protected void populateViewHolder(final FireChatRoomViewHolder viewHolder, final ChatRoom model, final int position) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                String imgUrl = SingletonCM.getInstance().getUserIcon().toString();
+
                 if (userFilterText.isEmpty()) {
                     viewHolder.roomNameText.setText(model.getRoomName());
+                    viewHolder.isFilterName(true);
                     viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            onItemClickCustom(viewHolder, false);
+                            onItemClickCustom(viewHolder);
                         }
                     });
-                    viewHolder.roomNameText.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            onItemClickCustom(viewHolder, true);
-                            return false;
-                        }
-                    });
+
                 } else if (model.getRoomName().contains(userFilterText)) {
                     viewHolder.roomNameText.setText(model.getRoomName());
+                    viewHolder.isFilterName(true);
                     viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            onItemClickCustom(viewHolder, false);
-                        }
-                    });
-                    viewHolder.roomNameText.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            onItemClickCustom(viewHolder, true);
-                            return false;
+                            onItemClickCustom(viewHolder);
                         }
                     });
                 } else {
                     viewHolder.roomNameText.setVisibility(View.GONE);
+                    viewHolder.isFilterName(false);
                 }
             }
         };
@@ -154,24 +151,16 @@ public class RoomsFragment extends android.app.Fragment {
 
     /**
      * @param viewHolder - you know ;)
-     * @param type       - use false if onClick, or true if OnLongClick
      */
-    private void onItemClickCustom(FireChatRoomViewHolder viewHolder, boolean type) {
+    private void onItemClickCustom(FireChatRoomViewHolder viewHolder) {
+        SingletonCM.getInstance().setUserRoom(viewHolder.roomNameText.getText().toString());
 
-        if (type) {
-            Toast.makeText(context, "long tap", Toast.LENGTH_SHORT).show();
-        } else {
-            SingletonCM.getInstance().setUserRoom(viewHolder.roomNameText.getText().toString());
-            fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
-            fragmentTransaction.commit();
-        }
-
-
+        fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
-
-    public void addNewRoom(Context context) {
+    public void addNewRoom(final Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.room_add_new, null);
         AlertDialog.Builder builder = new AlertDialog
@@ -183,10 +172,12 @@ public class RoomsFragment extends android.app.Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (!editName.getText().toString().isEmpty()) {
-
                             userRoomName = editName.getText().toString();
-                            ChatRoom newRoom = new ChatRoom(userRoomName);
+
+                            roomKey = mDatabaseReference.child(CHILD_THREE).push().getKey();
+                            ChatRoom newRoom = new ChatRoom(userRoomName, roomKey);
                             mDatabaseReference.child(CHILD_THREE).push().setValue(newRoom);
+
                             SingletonCM.getInstance().setUserRoom(userRoomName);
                             fragmentTransaction = getFragmentManager().beginTransaction();
                             fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
@@ -220,13 +211,25 @@ public class RoomsFragment extends android.app.Fragment {
     public static class FireChatRoomViewHolder extends RecyclerView.ViewHolder {
         public TextView roomNameText;
         public CircleImageView circleImageView;
-//        public TextView userRoomCountText;
+        private final LinearLayout mRoom;
+        private ImageView favoriteStar;
+        private TextView favoriteText;
 
         public FireChatRoomViewHolder(View view) {
             super(view);
             circleImageView = (CircleImageView) view.findViewById(R.id.ar_roomIcon);
             roomNameText = (TextView) view.findViewById(R.id.ar_roomName);
-//            userRoomCountText = (TextView) view.findViewById(R.id.ar_userCount);
+            mRoom = (LinearLayout) itemView.findViewById(R.id.ar_room_layout_container);
+            favoriteStar = (ImageView) view.findViewById(R.id.ar_room_star_iv);
+            favoriteText = (TextView) view.findViewById(R.id.ar_room_star_text);
+        }
+
+        public void isFilterName(boolean state) {
+            if (state) {
+                mRoom.setVisibility(View.VISIBLE);
+            } else {
+                mRoom.setVisibility(View.GONE);
+            }
         }
     }
 
