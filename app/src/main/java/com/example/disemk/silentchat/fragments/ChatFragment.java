@@ -78,8 +78,9 @@ public class ChatFragment extends android.app.Fragment {
 
         mMsgEText = (EditText) container.findViewById(R.id.msgEditText);
         mSendButtn = (Button) container.findViewById(R.id.sendButton);
+
         mProgressBar = (ProgressBar) container.findViewById(R.id.progressBar);
-        mProgressBar.setVisibility(ProgressBar.VISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
 
         mMsgRecyclerView = (RecyclerView) container.findViewById(R.id.messageRecyclerView);
 
@@ -131,7 +132,7 @@ public class ChatFragment extends android.app.Fragment {
     }
 
     private void setmFBAdapterUn() {
-        mProgressBar.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.INVISIBLE);
 
         mFBAdapter = new FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder>(
                 ChatMessage.class,
@@ -153,20 +154,20 @@ public class ChatFragment extends android.app.Fragment {
                 firechatMsgViewHolder.msgText.setText(chatMessage.getText());
                 firechatMsgViewHolder.userText.setText(chatMessage.getName());
 
-                if (mFirebaseUser.getPhotoUrl() == null) {
-                    Glide.with(ChatFragment.this).
-                            load(SingletonCM
-                                    .getInstance()
-                                    .getUserIcon())
-                            .into(firechatMsgViewHolder.userImage);
-                } else {
+//                if (mFirebaseUser.getPhotoUrl() == null) {
+//                    Glide.with(ChatFragment.this).
+//                            load(SingletonCM
+//                                    .getInstance()
+//                                    .getUserIcon())
+//                            .into(firechatMsgViewHolder.userImage);
+//                } else {
 
                     mUsername = mFirebaseUser.getDisplayName();
                     mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
                     Glide.with(ChatFragment.this).
                             load(chatMessage.getPhotoUrl()).into(firechatMsgViewHolder.userImage);
                 }
-            }
+//            }
         };
 
         mFBAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {

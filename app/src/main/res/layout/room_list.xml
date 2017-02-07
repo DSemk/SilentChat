@@ -31,7 +31,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:id="@+id/ar_room_star_text"
-                    android:text="@string/room_list_star_text_ru" />
+                    android:text="@string/room_list_star_text_add_ru" />
 
                 <ImageView
                     android:layout_width="wrap_content"

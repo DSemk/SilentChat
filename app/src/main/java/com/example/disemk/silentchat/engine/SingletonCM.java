@@ -2,6 +2,8 @@ package com.example.disemk.silentchat.engine;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+
 /**
  * Created by icoper on 26.01.17.
  */
@@ -23,6 +25,15 @@ public class SingletonCM {
     private String userName;
     private String userIcon;
     private String userFilterRoom;
+    private ArrayList<String> favoriteRoomList;
+
+    public ArrayList<String> getFavoriteRoomList() {
+        return favoriteRoomList;
+    }
+
+    public void setFavoriteRoomList(ArrayList<String> favoriteRoomList) {
+        this.favoriteRoomList = favoriteRoomList;
+    }
 
     public String getUserFilterRoom() {
         return userFilterRoom;

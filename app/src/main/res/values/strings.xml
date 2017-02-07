@@ -30,5 +30,6 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string name="action_settings">Settings</string>
-    <string name="room_list_star_text_ru">добавить в избранное </string>
+    <string name="room_list_star_text_add_ru">добавить в избранное </string>
+    <string name="room_list_star_text_done_ru">в избранном </string>
 </resources>

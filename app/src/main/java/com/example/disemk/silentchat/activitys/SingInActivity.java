@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.engine.BaseDataMaster;
 import com.example.disemk.silentchat.engine.SingletonCM;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -39,6 +40,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.ArrayList;
+
 /**
  * Created by disemk on 11.01.17.
  */
@@ -48,13 +51,14 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     private static final String TAG = "SingInActivity";
     private static final String APP_PREFERENCES = "silent_pref";
     private static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
-    ;
+
 
     private SharedPreferences mSharedPreferences;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private BaseDataMaster dataMaster;
 
     private SignInButton mSignInButton;
     private CheckBox checkInfo;
@@ -101,8 +105,8 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
 
         };
         initialize();
-        checkUserAuth();
         loadSharPrefData();
+        checkUserAuth();
     }
 
     // Check you are a new user,or not.
@@ -132,11 +136,13 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
+
     }
 
     private void loadSharPrefData() {
         try {
             mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+            // load favorite rooms from db
         } catch (Resources.NotFoundException e) {
             SingletonCM.getInstance().setBackgroundID(R.drawable.back_4);
         }

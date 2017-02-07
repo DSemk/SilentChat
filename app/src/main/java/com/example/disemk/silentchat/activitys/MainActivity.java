@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.engine.BaseDataHelper;
+import com.example.disemk.silentchat.engine.BaseDataMaster;
 import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.fragments.ChatFragment;
 import com.example.disemk.silentchat.fragments.RoomsFragment;
@@ -91,28 +93,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.menu_main) {
-//            createAlertDialog();
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     public void createAlertDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
@@ -154,8 +134,6 @@ public class MainActivity extends AppCompatActivity
         alertDialog.show();
     }
 
-
-
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -191,7 +169,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
             transaction.replace(R.id.ma_container, settingsFragment).addToBackStack(null);
         } else if (id == R.id.nav_favorite) {
-            Toast.makeText(getApplicationContext(), "In Develop", Toast.LENGTH_SHORT).show();
+            RoomsFragment.getRoomsInstanse().showFavorite(MainActivity.this);
         }
         transaction.commit();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
