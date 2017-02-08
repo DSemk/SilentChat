@@ -12,6 +12,18 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.disemk.silentchat.fragments.RoomsFragment">
 
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/roomRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/back_5"
+        android:scaleType="centerCrop"
+        android:layout_alignParentTop="true">
+
+    </android.support.v7.widget.RecyclerView>
+
     <ProgressBar
         android:id="@+id/ar_progressBar"
         style="?android:attr/progressBarStyleLarge"
@@ -21,22 +33,13 @@
         android:layout_centerVertical="true" />
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/roomRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/back_5"
-        android:scaleType="centerCrop"
-        android:layout_alignParentTop="true" />
-
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true">
 
-        <android.support.design.widget.FloatingActionButton
+        <com.melnykov.fab.FloatingActionButton
             android:id="@+id/ar_addRoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

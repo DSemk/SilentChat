@@ -25,7 +25,25 @@ public class SingletonCM {
     private String userName;
     private String userIcon;
     private String userFilterRoom;
+    private String uid;
     private ArrayList<String> favoriteRoomList;
+    private String fBAdapterMode;
+
+    public String getfBAdapterMode() {
+        return fBAdapterMode;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public void setfBAdapterMode(String fBAdapterMode) {
+        this.fBAdapterMode = fBAdapterMode;
+    }
 
     public ArrayList<String> getFavoriteRoomList() {
         return favoriteRoomList;

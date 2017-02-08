@@ -1,10 +1,15 @@
 package com.example.disemk.silentchat.activitys;
 
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -15,6 +20,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.animation.LinearInterpolator;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,11 +33,14 @@ import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.fragments.ChatFragment;
 import com.example.disemk.silentchat.fragments.RoomsFragment;
 import com.example.disemk.silentchat.fragments.SettingsFragment;
+import com.google.android.gms.games.multiplayer.realtime.Room;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String FAVORITE_MODE = "favorite_m";
+    private static final String STOCK_MODE = "stock_m";
     private final String APP_TITLE_NAME = "Silent Chat";
     private FragmentTransaction transaction;
     private RoomsFragment roomsFragment;
@@ -45,7 +54,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle(APP_TITLE_NAME);
+        setTitle("Все чаты");
 
         initialize();
         transaction = getFragmentManager().beginTransaction();
@@ -57,7 +66,6 @@ public class MainActivity extends AppCompatActivity
 
     private void initialize() {
         SingletonCM.getInstance().setMainContext(this);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -108,18 +116,20 @@ public class MainActivity extends AppCompatActivity
                         if (!editName.getText().toString().isEmpty()) {
                             SingletonCM.getInstance()
                                     .setUserFilterRoom(editName.getText().toString());
-                            transaction = getFragmentManager().beginTransaction();
-                            transaction.remove(roomsFragment);
-                            transaction.commit();
-
-                            transaction = getFragmentManager().beginTransaction();
-                            transaction.add(R.id.ma_container, roomsFragment);
-                            transaction.commit();
+                            SingletonCM.getInstance().setfBAdapterMode(STOCK_MODE);
+                            RoomsFragment.getRoomsInstanse().setUserFilterText(editName.getText().toString());
+                            setTitle("Поиск : " + editName.getText().toString());
+                            getFragmentManager()
+                                    .beginTransaction()
+                                    .detach(roomsFragment)
+                                    .attach(roomsFragment)
+                                    .commit();
                         } else {
                             Toast.makeText(
                                     MainActivity.this, "Введите имя комнаты",
                                     Toast.LENGTH_SHORT
                             ).show();
+                            return;
                         }
                     }
                 }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
@@ -139,6 +149,15 @@ public class MainActivity extends AppCompatActivity
         super.onRestart();
     }
 
+    private static MainActivity mainInstanse = new MainActivity();
+
+    public static MainActivity getMainInstanse() {
+        return mainInstanse;
+    }
+
+    public void setCustomTitle(String str) {
+        setTitle(str);
+    }
     @Override
     public void onBackPressed() {
         if (back_pressed + 2000 > System.currentTimeMillis()) {
@@ -162,20 +181,30 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_found) {
             createAlertDialog();
         } else if (id == R.id.nav_all_chats) {
+            setTitle("Все чаты");
             transaction.remove(roomsFragment);
             // setUserFilterRoom need by is - "" from init all rooms.
             SingletonCM.getInstance().setUserFilterRoom("");
+            SingletonCM.getInstance().setfBAdapterMode(STOCK_MODE);
             transaction.replace(R.id.ma_container, roomsFragment).addToBackStack(null);
         } else if (id == R.id.nav_settings) {
+            setTitle("Настрйоки");
             transaction.replace(R.id.ma_container, settingsFragment).addToBackStack(null);
         } else if (id == R.id.nav_favorite) {
-            RoomsFragment.getRoomsInstanse().showFavorite(MainActivity.this);
+            setTitle("Избранное");
+            // setUserFilterRoom need by is - "" from init all rooms.
+            SingletonCM.getInstance().setfBAdapterMode(FAVORITE_MODE);
+            RoomsFragment.getRoomsInstanse().setfBAdapterMode(FAVORITE_MODE);
+            getFragmentManager()
+                    .beginTransaction()
+                    .detach(roomsFragment)
+                    .attach(roomsFragment)
+                    .commit();
         }
+
         transaction.commit();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
 }

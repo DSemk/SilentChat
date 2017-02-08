@@ -9,15 +9,25 @@ public class ChatMessage {
     private String name;
     private String photoUrl;
     private String room;
+    private String uid;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(String text, String name, String photoUrl, String room) {
+    public ChatMessage(String text, String name, String photoUrl, String room, String uid) {
         this.text = text;
         this.name = name;
         this.photoUrl = photoUrl;
         this.room = room;
+        this.uid = uid;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getText() {

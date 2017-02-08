@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RotateDrawable;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,25 +27,37 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.activitys.MainActivity;
 import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.models.ChatMessage;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatFragment extends android.app.Fragment {
+public class ChatFragment extends android.app.Fragment implements SoundPool.OnLoadCompleteListener {
     private static final String CHILD_TREE = "massages";
     public static final String APP_PREFERENCES = "mysettings_silent";
     public static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
+    final int MAX_STREAMS = 5;
+
+    private SoundPool sp;
+    private int soundIdShot;
+    private int soundIdExplosion;
 
     private Context context;
-    private SharedPreferences mSharedPreferences;
     private String romName;
     private int msgLayout;
+    private boolean canPlaySound;
 
     private DatabaseReference mDatabaseReference;
     private FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder> mFBAdapter;
@@ -54,6 +68,7 @@ public class ChatFragment extends android.app.Fragment {
     private FirebaseUser mFirebaseUser;
     private String mUsername;
     private String mPhotoUrl;
+    private String mUid;
 
     private Button mSendButtn;
     private EditText mMsgEText;
@@ -80,12 +95,13 @@ public class ChatFragment extends android.app.Fragment {
         mSendButtn = (Button) container.findViewById(R.id.sendButton);
 
         mProgressBar = (ProgressBar) container.findViewById(R.id.progressBar);
-        mProgressBar.setVisibility(View.VISIBLE);
 
         mMsgRecyclerView = (RecyclerView) container.findViewById(R.id.messageRecyclerView);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        mUid = mFirebaseUser.getUid();
+        mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
 
         mLayoutManager = new LinearLayoutManager(context);
         mLayoutManager.setStackFromEnd(true);
@@ -93,6 +109,16 @@ public class ChatFragment extends android.app.Fragment {
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
+        sp = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+        sp.setOnLoadCompleteListener(this);
+
+        soundIdShot = sp.load(context, R.raw.new_msg_sound, 1);
+
+        try {
+            soundIdExplosion = sp.load(context.getAssets().openFd("explosion.ogg"), 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         SingletonCM.getInstance();
         setmFBAdapterUn();
         setBackground(container);
@@ -102,14 +128,12 @@ public class ChatFragment extends android.app.Fragment {
             public void onClick(View v) {
                 if (!mMsgEText.getText().toString().isEmpty()) {
                     ChatMessage frendlyMsg = new ChatMessage(
-                            mMsgEText.getText().toString(), mUsername, mPhotoUrl, romName);
+                            mMsgEText.getText().toString(), mUsername, mPhotoUrl, romName, mUid);
                     mDatabaseReference.child(romName).push().setValue(frendlyMsg);
                     mMsgEText.setText("");
                 } else {
                     Toast.makeText(context, "Enter msg first!", Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         });
 
@@ -126,51 +150,45 @@ public class ChatFragment extends android.app.Fragment {
             }
         });
 
+
         mMsgRecyclerView.setLayoutManager(mLayoutManager);
         mMsgRecyclerView.setAdapter(mFBAdapter);
-
     }
 
     private void setmFBAdapterUn() {
-        mProgressBar.setVisibility(View.INVISIBLE);
-
+        canPlaySound = false;// разрешено ли воспроизводить звук
         mFBAdapter = new FirebaseRecyclerAdapter<ChatMessage, FirechatMsgViewHolder>(
                 ChatMessage.class,
                 R.layout.message,
                 FirechatMsgViewHolder.class,
                 mDatabaseReference.child(romName)
         ) {
-
             @Override
             protected void populateViewHolder(FirechatMsgViewHolder firechatMsgViewHolder, ChatMessage chatMessage, int i) {
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-
-                if (chatMessage.getName().equals(mUsername)
-                        && SingletonCM.getInstance().getUserIcon().equals(mPhotoUrl)) {
+                if (chatMessage.getUid().equals(mUid)) {
+                    canPlaySound = false;
                     firechatMsgViewHolder.setIsSender(true);
                 } else {
+                    canPlaySound = true;
                     firechatMsgViewHolder.setIsSender(false);
                 }
                 firechatMsgViewHolder.msgText.setText(chatMessage.getText());
                 firechatMsgViewHolder.userText.setText(chatMessage.getName());
 
-//                if (mFirebaseUser.getPhotoUrl() == null) {
-//                    Glide.with(ChatFragment.this).
-//                            load(SingletonCM
-//                                    .getInstance()
-//                                    .getUserIcon())
-//                            .into(firechatMsgViewHolder.userImage);
-//                } else {
-
-                    mUsername = mFirebaseUser.getDisplayName();
+                mUsername = mFirebaseUser.getDisplayName();
+                if (mPhotoUrl.equals("")) {
                     mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
-                    Glide.with(ChatFragment.this).
-                            load(chatMessage.getPhotoUrl()).into(firechatMsgViewHolder.userImage);
                 }
-//            }
+                Glide.with(ChatFragment.this).
+                        load(chatMessage.getPhotoUrl()).into(firechatMsgViewHolder.userImage);
+
+            }
+
         };
 
         mFBAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            int mCurrentItemsCount = 0;
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
@@ -180,6 +198,24 @@ public class ChatFragment extends android.app.Fragment {
                         (positionStart >= (chatMsgCount - 1) && lastVisiblePosition == (positionStart - 1))) {
                     mMsgRecyclerView.scrollToPosition(positionStart);
                 }
+                if (mCurrentItemsCount < chatMsgCount && canPlaySound) {
+                    //проигрываем звук
+                    sp.play(soundIdShot, 1, 1, 0, 0, 1);
+                    sp.play(soundIdExplosion, 1, 1, 0, 0, 1);
+                }
+                mCurrentItemsCount = chatMsgCount;
+            }
+
+            @Override
+            public void onChanged() {
+                super.onChanged();
+
+                if (mCurrentItemsCount < mFBAdapter.getItemCount()) {
+                    //проигрываем звук
+                    sp.play(soundIdShot, 1, 1, 0, 0, 1);
+//                    sp.play(soundIdExplosion, 1, 1, 0, 0, 1);
+                }
+                mCurrentItemsCount = mFBAdapter.getItemCount();
             }
         });
 
@@ -187,7 +223,11 @@ public class ChatFragment extends android.app.Fragment {
         mMsgRecyclerView.setAdapter(mFBAdapter);
 
         mUsername = mFirebaseUser.getDisplayName().toString();
+        canPlaySound = true;
+    }
 
+    @Override
+    public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
 
     }
 
@@ -236,6 +276,7 @@ public class ChatFragment extends android.app.Fragment {
             ((RotateDrawable) mRightArrow.getBackground()).getDrawable()
                     .setColorFilter(color, PorterDuff.Mode.SRC);
         }
+
     }
 
 
@@ -247,6 +288,4 @@ public class ChatFragment extends android.app.Fragment {
         }
 
     }
-
-
 }

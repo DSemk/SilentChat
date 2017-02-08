@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.example.disemk.silentchat.R;
 import com.example.disemk.silentchat.engine.BaseDataMaster;
 import com.example.disemk.silentchat.engine.SingletonCM;
+import com.example.disemk.silentchat.fragments.RoomsFragment;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -51,6 +52,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     private static final String TAG = "SingInActivity";
     private static final String APP_PREFERENCES = "silent_pref";
     private static final String APP_PREFERENCES_BACKGROUND_ID = "backgroundId";
+    private static final String APP_PREFERENCES_USER_ID = "uid";
 
 
     private SharedPreferences mSharedPreferences;
@@ -59,6 +61,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private BaseDataMaster dataMaster;
+    private String uid;
 
     private SignInButton mSignInButton;
     private CheckBox checkInfo;
@@ -96,6 +99,14 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                 mFirebaseUser = firebaseAuth.getCurrentUser();
                 if (mFirebaseUser != null) {
                     pushFBaseUserInfo();
+                    uid = mFirebaseUser.getUid();
+                    if (!uid.isEmpty()) {
+                        mSharedPreferences = SingInActivity.this
+                                .getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = mSharedPreferences.edit();
+                        editor.putString(APP_PREFERENCES_USER_ID, uid);
+                        editor.apply();
+                    }
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + mFirebaseUser.getUid());
                 } else {
                     // User is signed out
@@ -147,11 +158,12 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             SingletonCM.getInstance().setBackgroundID(R.drawable.back_4);
         }
 
-        if (mSharedPreferences.contains(APP_PREFERENCES_BACKGROUND_ID)) {
+        if (mSharedPreferences.contains(APP_PREFERENCES_BACKGROUND_ID) &&
+                mSharedPreferences.contains(APP_PREFERENCES_USER_ID)) {
             SingletonCM.getInstance().setBackgroundID(mSharedPreferences.getInt(APP_PREFERENCES_BACKGROUND_ID, 0));
+            SingletonCM.getInstance().setUid(mSharedPreferences.getString(APP_PREFERENCES_USER_ID, ""));
             Log.d(TAG, "Data is load");
         } else Log.d(TAG, "Data load faild");
-
     }
 
     private void authorize() {
