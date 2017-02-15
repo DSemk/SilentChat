@@ -128,14 +128,19 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
             if (!SingletonCM.getInstance().getUserFilterRoom().isEmpty()) {
                 userFilterText = SingletonCM.getInstance().getUserFilterRoom();
             }
-            fBAdapterMode = SingletonCM.getInstance().getfBAdapterMode();
-            if (fBAdapterMode.isEmpty()) {
-                Log.d("Adapter mode", " Null");
-            }
+//            fBAdapterMode = SingletonCM.getInstance().getfBAdapterMode();
+//            if (fBAdapterMode.isEmpty()) {
+//                Log.d("Adapter mode", " Null");
+//            }
         } catch (NullPointerException e) {
-            fBAdapterMode = STOCK_MODE;
+//            fBAdapterMode = STOCK_MODE;
             e.printStackTrace();
         }
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            fBAdapterMode = bundle.getString("mode");
+        } else fBAdapterMode = STOCK_MODE;
+
         favoriteRooms = SingletonCM.getInstance().getFavoriteRoomList();
         chatFragment = new ChatFragment();
 
@@ -199,7 +204,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
 
         } else if (fBAdapterMode.equals(FAVORITE_MODE)) {
 
-            if (favoriteRooms.size() == 0) {
+            if (favoriteRooms.size() == 0 || favoriteRooms.isEmpty()) {
                 Toast.makeText(context, "Пока здесь пусто", Toast.LENGTH_SHORT).show();
             } else {
                 mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<ChatRoom, FireChatRoomViewHolder>(

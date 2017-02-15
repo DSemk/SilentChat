@@ -36,6 +36,8 @@ import com.example.disemk.silentchat.fragments.RoomsFragment;
 import com.example.disemk.silentchat.fragments.SettingsFragment;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 
+import java.util.ArrayList;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
@@ -181,40 +183,45 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         transaction = getFragmentManager().beginTransaction();
+        Bundle bundle = new Bundle();
         if (id == R.id.nav_found) {
             createAlertDialog();
         } else if (id == R.id.nav_all_chats) {
             setTitle("Все чаты");
-            transaction.remove(roomsFragment);
+            RoomsFragment fragment = new RoomsFragment();
             // setUserFilterRoom need by is - "" from init all rooms.
             SingletonCM.getInstance().setUserFilterRoom("");
-            SingletonCM.getInstance().setfBAdapterMode(STOCK_MODE);
-            transaction.replace(R.id.ma_container, roomsFragment).addToBackStack(null);
+            bundle.putString("mode", STOCK_MODE);
+            fragment.setArguments(bundle);
+            transaction.replace(R.id.ma_container, fragment).addToBackStack(null);
         } else if (id == R.id.nav_settings) {
             setTitle("Настрйоки");
             transaction.replace(R.id.ma_container, settingsFragment).addToBackStack(null);
         } else if (id == R.id.nav_favorite) {
             setTitle("Избранное");
-            // setUserFilterRoom need by is - "" from init all rooms.
-            SingletonCM.getInstance().setfBAdapterMode(FAVORITE_MODE);
-            getFragmentManager()
-                    .beginTransaction()
-                    .detach(roomsFragment)
-                    .attach(roomsFragment)
-                    .commit();
+            ArrayList<String> favoriteRooms = new ArrayList<>();
+            try {
+                favoriteRooms = SingletonCM.getInstance().getFavoriteRoomList();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            if (favoriteRooms.size() == 0 || favoriteRooms.isEmpty()) {
+                Toast.makeText(this, "Пока здесь пусто", Toast.LENGTH_SHORT).show();
+            } else {
+                RoomsFragment fragment = new RoomsFragment();
+                bundle.putString("mode", FAVORITE_MODE);
+                fragment.setArguments(bundle);
+                transaction.replace(R.id.ma_container, fragment).addToBackStack(null);
+            }
+
         } else if (id == R.id.nav_myRoom) {
             setTitle("Мои чаты");
-            SingletonCM.getInstance().setfBAdapterMode(MY_ROOM_MODE);
-            getFragmentManager()
-                    .beginTransaction()
-                    .detach(roomsFragment)
-                    .attach(roomsFragment)
-                    .commit();
+            RoomsFragment fragment = new RoomsFragment();
+
+            bundle.putString("mode", MY_ROOM_MODE);
+            fragment.setArguments(bundle);
+            transaction.replace(R.id.ma_container, fragment).addToBackStack(null);
         }
-//        }else if(id == R.id.nav_exit_acc){
-//            startActivity(new Intent(MainActivity.this,SingInActivity.class)
-//                    .putExtra("choiceUsr",true));
-//        }
         transaction.commit();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
