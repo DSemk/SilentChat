@@ -66,6 +66,8 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     private SignInButton mSignInButton;
     private CheckBox checkInfo;
 
+    private boolean choiceUsr;
+
 
     /**
      * @metod - loadSharPrefData() - load user settings chenges;
@@ -76,6 +78,9 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_singin);
+        choiceUsr = false;
+        Intent intent = getIntent();
+        choiceUsr = intent.getBooleanExtra("choiceUsr", false);
 
         // START config_singin
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -126,6 +131,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             pushFBaseUserInfo();
             startActivity(new Intent(SingInActivity.this, MainActivity.class).putExtra("status", false));
             finish();
+
         }
     }
 
@@ -143,11 +149,8 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                 }
             }
         });
-
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-
-
     }
 
     private void loadSharPrefData() {
@@ -197,7 +200,6 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
@@ -269,6 +271,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                 .build();
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
@@ -289,4 +292,8 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
         mGoogleApiClient.disconnect();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

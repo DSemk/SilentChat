@@ -3,6 +3,7 @@ package com.example.disemk.silentchat.activitys;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -41,7 +42,9 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String FAVORITE_MODE = "favorite_m";
     private static final String STOCK_MODE = "stock_m";
-    private final String APP_TITLE_NAME = "Silent Chat";
+    private static final String MY_ROOM_MODE = "myRoom_m";
+    private static final String APP_TITLE_NAME = "Silent Chat";
+
     private FragmentTransaction transaction;
     private RoomsFragment roomsFragment;
     private SettingsFragment settingsFragment;
@@ -194,14 +197,24 @@ public class MainActivity extends AppCompatActivity
             setTitle("Избранное");
             // setUserFilterRoom need by is - "" from init all rooms.
             SingletonCM.getInstance().setfBAdapterMode(FAVORITE_MODE);
-            RoomsFragment.getRoomsInstanse().setfBAdapterMode(FAVORITE_MODE);
+            getFragmentManager()
+                    .beginTransaction()
+                    .detach(roomsFragment)
+                    .attach(roomsFragment)
+                    .commit();
+        } else if (id == R.id.nav_myRoom) {
+            setTitle("Мои чаты");
+            SingletonCM.getInstance().setfBAdapterMode(MY_ROOM_MODE);
             getFragmentManager()
                     .beginTransaction()
                     .detach(roomsFragment)
                     .attach(roomsFragment)
                     .commit();
         }
-
+//        }else if(id == R.id.nav_exit_acc){
+//            startActivity(new Intent(MainActivity.this,SingInActivity.class)
+//                    .putExtra("choiceUsr",true));
+//        }
         transaction.commit();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

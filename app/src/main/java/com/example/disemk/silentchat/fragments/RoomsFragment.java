@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
@@ -34,6 +36,9 @@ import com.example.disemk.silentchat.engine.BaseDataMaster;
 import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.models.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.TaskExecutors;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,21 +56,30 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     private static final String FAVORITE_MODE = "favorite_m";
     private static final String STOCK_MODE = "stock_m";
     private static final String CHILD_THREE = "all rooms";
+    private static final String MY_ROOM_MODE = "myRoom_m";
     private boolean FAB_Status = false;
+    private final String usersCountText = "учасников : ";
 
     private Context context;
     private String userFilterText;
     private ChatFragment chatFragment;
     private FragmentTransaction fragmentTransaction;
     private BaseDataMaster dataMaster;
+
     public String userRoomName;
+    private String mUid;
     public String roomKey;
+    private String usersCount;
+    private ArrayList<String> usersList;
+
     private static RoomsFragment roomsInstanse = new RoomsFragment();
     private ArrayList<String> favoriteRooms;
     private EditText editName;
     private TextInputLayout mUsernameLayout;
 
     private DatabaseReference mDatabaseReference;
+    private FirebaseUser mFirebaseUser;
+    private FirebaseAuth mFirebaseAuth;
     private FirebaseRecyclerAdapter<ChatRoom, FireChatRoomViewHolder> mFirebaseRecyclerAdapter;
     private RecyclerView mRoomRecyclerView;
     private LinearLayoutManager mLinerLayoutManager;
@@ -73,6 +87,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     public FloatingActionButton mAddRoom;
     private View rfView;
     private String fBAdapterMode;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,7 +113,12 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
      * @param container
      */
     private void initialize(final View container) {
+        hasConnection(context);
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
         dataMaster = BaseDataMaster.getDataMaster(context);
+        mUid = mFirebaseUser.getUid();
         fBAdapterMode = "";
         editName = (EditText) container.findViewById(R.id.ad_addNewRoom_et);
         mUsernameLayout = (TextInputLayout) container.findViewById(R.id.add_room_layout_ad);
@@ -150,15 +170,25 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
                     viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            onItemClickCustom(viewHolder);
+                            onItemClickCustom(viewHolder, model);
                         }
                     });
                     if (userFilterText.isEmpty()) {
-                        viewHolder.roomNameText.setText(model.getRoomName());
+                        try {
+                            viewHolder.roomNameText.setText(model.getRoomName());
+                            viewHolder.peopleCount.setText(usersCountText + model.getUsersCount());
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
                         roomFavoriteOrNo(model.getRoomKey(), viewHolder);
                         viewHolder.isFilterName(true);
                     } else if (model.getRoomName().contains(userFilterText)) {
-                        viewHolder.roomNameText.setText(model.getRoomName());
+                        try {
+                            viewHolder.roomNameText.setText(model.getRoomName());
+                            viewHolder.peopleCount.setText(usersCountText + model.getUsersCount());
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
                         viewHolder.isFilterName(true);
                         roomFavoriteOrNo(model.getRoomKey(), viewHolder);
                     } else {
@@ -167,19 +197,6 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
                 }
             };
 
-            mFirebaseRecyclerAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                @Override
-                public void onItemRangeInserted(int positionStart, int itemCount) {
-                    super.onItemRangeInserted(positionStart, itemCount);
-                    int roomNameCount = mFirebaseRecyclerAdapter.getItemCount();
-                    int lastVisiblePosition = mLinerLayoutManager.findLastCompletelyVisibleItemPosition();
-                    if (lastVisiblePosition == -1 ||
-                            (positionStart >= (roomNameCount - 1) && lastVisiblePosition == (positionStart - 1))) {
-                        mRoomRecyclerView.scrollToPosition(positionStart);
-                    }
-                }
-
-            });
         } else if (fBAdapterMode.equals(FAVORITE_MODE)) {
 
             if (favoriteRooms.size() == 0) {
@@ -203,7 +220,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
                         viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                onItemClickCustom(viewHolder);
+                                onItemClickCustom(viewHolder, model);
                             }
                         });
                         String roomKey = model.getRoomKey();
@@ -216,30 +233,64 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
                         if (!listRoomKey.isEmpty()) {
                             viewHolder.isFilterName(true);
                             viewHolder.isFavoriteRomm(true);
-                            viewHolder.roomNameText.setText(model.getRoomName());
+                            try {
+                                viewHolder.roomNameText.setText(model.getRoomName());
+                                viewHolder.peopleCount.setText(usersCountText + model.getUsersCount());
+                            } catch (NullPointerException e) {
+                                e.printStackTrace();
+                            }
                         } else {
                             viewHolder.isFilterName(false);
                         }
                     }
                 };
-                mFirebaseRecyclerAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                    @Override
-                    public void onItemRangeInserted(int positionStart, int itemCount) {
-                        super.onItemRangeInserted(positionStart, itemCount);
-                        int roomNameCount = mFirebaseRecyclerAdapter.getItemCount();
-                        int lastVisiblePosition = mLinerLayoutManager.findLastCompletelyVisibleItemPosition();
-                        if (lastVisiblePosition == -1 ||
-                                (positionStart >= (roomNameCount - 1) && lastVisiblePosition == (positionStart - 1))) {
-                            mRoomRecyclerView.scrollToPosition(positionStart);
-                        }
-                    }
-                });
-
             }
+        } else if (fBAdapterMode.equals(MY_ROOM_MODE)) {
+            mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<ChatRoom, FireChatRoomViewHolder>(
+                    ChatRoom.class,
+                    R.layout.room_list,
+                    FireChatRoomViewHolder.class,
+                    mDatabaseReference.child(CHILD_THREE)
+            ) {
+                @Override
+                protected void populateViewHolder(final FireChatRoomViewHolder viewHolder, final ChatRoom model, final int position) {
+                    mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                    viewHolder.roomNameText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onItemClickCustom(viewHolder, model);
+                        }
+                    });
+                    if (model.getCreatorId().equals(mUid)) {
+                        viewHolder.isFilterName(true);
+                        try {
+                            viewHolder.roomNameText.setText(model.getRoomName());
+                            viewHolder.peopleCount.setText(usersCountText + model.getUsersCount());
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
+                    } else viewHolder.isFilterName(false);
+                }
+            };
         }
+        mFirebaseRecyclerAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int roomNameCount = mFirebaseRecyclerAdapter.getItemCount();
+                int lastVisiblePosition = mLinerLayoutManager.findLastCompletelyVisibleItemPosition();
+                if (lastVisiblePosition == -1 ||
+                        (positionStart >= (roomNameCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                    mRoomRecyclerView.scrollToPosition(positionStart);
+                }
+            }
+
+        });
 
         mRoomRecyclerView.setLayoutManager(mLinerLayoutManager);
         mRoomRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
+        mFirebaseRecyclerAdapter.notifyDataSetChanged();
+
 
         mAddRoom.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -292,8 +343,32 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     /**
      * @param viewHolder - you know ;)
      */
-    private void onItemClickCustom(FireChatRoomViewHolder viewHolder) {
+    private void onItemClickCustom(FireChatRoomViewHolder viewHolder, ChatRoom model) {
         SingletonCM.getInstance().setUserRoom(viewHolder.roomNameText.getText().toString());
+        boolean found = false;
+        int count = 0;
+        usersList = model.getUsersList();
+        for (String s : usersList) {
+            if (s.equals(mUid)) {
+                found = true;
+            }
+        }
+        if (!found) {
+            usersList.add(mUid);
+            count = Integer.parseInt(model.getUsersCount().toString());
+            count++;
+            String countS = String.valueOf(count);
+
+            mDatabaseReference.child(CHILD_THREE)
+                    .child(model.getRoomKey())
+                    .child("usersList")
+                    .setValue(usersList);
+            mDatabaseReference.child(CHILD_THREE)
+                    .child(model.getRoomKey())
+                    .child("usersCount")
+                    .setValue(countS);
+
+        }
 
         fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.ma_container, chatFragment).addToBackStack(null);
@@ -320,8 +395,10 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
                         if (!editName.getText().toString().isEmpty()) {
                             userRoomName = editName.getText().toString();
                             roomKey = mDatabaseReference.child(CHILD_THREE).push().getKey();
-                            ChatRoom newRoom = new ChatRoom(userRoomName, roomKey);
-                            mDatabaseReference.child(CHILD_THREE).push().setValue(newRoom);
+                            ArrayList<String> users = new ArrayList<>();
+                            users.add(mUid);
+                            ChatRoom newRoom = new ChatRoom(userRoomName, roomKey, mUid, users, "1");
+                            mDatabaseReference.child(CHILD_THREE).child(roomKey).setValue(newRoom);
 
                             SingletonCM.getInstance().setUserRoom(userRoomName);
                             fragmentTransaction = getFragmentManager().beginTransaction();
@@ -341,22 +418,13 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         alertDialog.show();
     }
 
+
     private void setBackground(View view) {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.roomRecyclerView);
         int id = SingletonCM.getInstance().getBackgroundID();
         if (id != 0) {
             recyclerView.setBackgroundResource(id);
         }
-    }
-
-    private void hideFAB() {
-        //Floating Action Button 1
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mAddRoom.getLayoutParams();
-        layoutParams.rightMargin -= (int) (mAddRoom.getWidth() * 1.7);
-        layoutParams.bottomMargin -= (int) (mAddRoom.getHeight() * 0.25);
-        mAddRoom.setLayoutParams(layoutParams);
-        mAddRoom.setClickable(false);
-
     }
 
     public static RoomsFragment getRoomsInstanse() {
@@ -369,6 +437,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         private final LinearLayout mRoom;
         private ImageView favoriteStar;
         private TextView favoriteText;
+        private TextView peopleCount;
 
         public FireChatRoomViewHolder(View view) {
             super(view);
@@ -377,6 +446,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
             mRoom = (LinearLayout) itemView.findViewById(R.id.ar_room_layout_container);
             favoriteStar = (ImageView) view.findViewById(R.id.ar_room_star_iv);
             favoriteText = (TextView) view.findViewById(R.id.ar_room_star_text);
+            peopleCount = (TextView) view.findViewById(R.id.ar_room_user_count);
         }
 
         public void isFilterName(boolean state) {
@@ -404,5 +474,41 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
 
     public void setfBAdapterMode(String fBAdapterMode) {
         this.fBAdapterMode = fBAdapterMode;
+    }
+
+    public static void hasConnection(final Context context) {
+        boolean connect = false;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            connect = true;
+        }
+        wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            connect = true;
+        }
+        wifiInfo = cm.getActiveNetworkInfo();
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            connect = true;
+        }
+
+        if (!connect) {
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            View view = layoutInflater.inflate(R.layout.alert_dialog_no_internet, null);
+            AlertDialog.Builder builder = new AlertDialog
+                    .Builder(new ContextThemeWrapper(context, R.style.myDialog));
+            builder.setView(view);
+            builder.setCancelable(false)
+                    .setPositiveButton("Выход", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                        }
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.setTitle("Ошибка");
+            alertDialog.show();
+        }
+
     }
 }

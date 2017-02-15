@@ -1,6 +1,17 @@
 package com.example.disemk.silentchat.engine;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+
+import com.example.disemk.silentchat.R;
+import com.example.disemk.silentchat.models.ChatRoom;
 
 import java.util.ArrayList;
 

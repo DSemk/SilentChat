@@ -8,6 +8,7 @@
     <color name="blue">#214dba</color>
     <color name="editMsgColor">#b6484848</color>
     <color name="material_gray_300">#E0E0E0</color>
-    <color name="material_blue_300">#70b9fd</color>
+    <color name="material_green_300">#6ece6e</color>
     <color name="material_white_300">#FFF</color>
+    <color name="blur_re">#35fffcfc</color>
 </resources>

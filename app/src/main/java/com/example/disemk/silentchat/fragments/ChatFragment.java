@@ -1,6 +1,7 @@
 package com.example.disemk.silentchat.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -8,8 +9,12 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RotateDrawable;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -88,7 +93,7 @@ public class ChatFragment extends android.app.Fragment implements SoundPool.OnLo
 
     // init all components
     private void initialize(View container) {
-
+        hasConnection(context);
         msgLayout = R.layout.chat_message;
 
         mMsgEText = (EditText) container.findViewById(R.id.msgEditText);
@@ -240,7 +245,7 @@ public class ChatFragment extends android.app.Fragment implements SoundPool.OnLo
         private final RelativeLayout mMessageContainer;
         private final LinearLayout mMessage;
         private final int mGreen300;
-        private final int mGray300;
+        private final int mWhite300;
 
         public FirechatMsgViewHolder(View view) {
             super(view);
@@ -251,8 +256,8 @@ public class ChatFragment extends android.app.Fragment implements SoundPool.OnLo
             mRightArrow = (FrameLayout) itemView.findViewById(R.id.right_arrow);
             mMessageContainer = (RelativeLayout) itemView.findViewById(R.id.message_container);
             mMessage = (LinearLayout) itemView.findViewById(R.id.message);
-            mGreen300 = ContextCompat.getColor(itemView.getContext(), R.color.material_blue_300);
-            mGray300 = ContextCompat.getColor(itemView.getContext(), R.color.material_gray_300);
+            mGreen300 = ContextCompat.getColor(itemView.getContext(), R.color.material_green_300);
+            mWhite300 = ContextCompat.getColor(itemView.getContext(), R.color.material_white_300);
         }
 
         public void setIsSender(boolean isSender) {
@@ -264,7 +269,7 @@ public class ChatFragment extends android.app.Fragment implements SoundPool.OnLo
                 mRightArrow.setVisibility(View.VISIBLE);
                 mMessageContainer.setGravity(Gravity.END);
             } else {
-                color = mGray300;
+                color = mWhite300;
                 mLeftArrow.setVisibility(View.VISIBLE);
                 mRightArrow.setVisibility(View.GONE);
                 mMessageContainer.setGravity(Gravity.START);
@@ -285,6 +290,42 @@ public class ChatFragment extends android.app.Fragment implements SoundPool.OnLo
         int id = SingletonCM.getInstance().getBackgroundID();
         if (id != 0) {
             view.setBackgroundResource(id);
+        }
+
+    }
+
+    public static void hasConnection(final Context context) {
+        boolean connect = false;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            connect = true;
+        }
+        wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            connect = true;
+        }
+        wifiInfo = cm.getActiveNetworkInfo();
+        if (wifiInfo != null && wifiInfo.isConnected()) {
+            connect = true;
+        }
+
+        if (!connect) {
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            View view = layoutInflater.inflate(R.layout.alert_dialog_no_internet, null);
+            AlertDialog.Builder builder = new AlertDialog
+                    .Builder(new ContextThemeWrapper(context, R.style.myDialog));
+            builder.setView(view);
+            builder.setCancelable(false)
+                    .setPositiveButton("Выход", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                        }
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.setTitle("Ошибка");
+            alertDialog.show();
         }
 
     }

@@ -11,18 +11,24 @@
             android:icon="@drawable/ic_grade_black_36dp"
             android:title="Избранное"></item>
         <item
+            android:id="@+id/nav_myRoom"
+            android:title="Мои чаты"
+            android:icon="@drawable/ic_forum_black_24dp"></item>
+        <item
             android:id="@+id/nav_all_chats"
             android:icon="@drawable/ic_group_black_36dp"
             android:title="Все чаты" />
     </group>
-
     <item android:title="Прочее">
         <menu>
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@drawable/ic_settings_black_36dp"
-                android:title="Настройки" />
+                android:title="Настройки">
+                <!--<item android:id="@+id/nav_exit_acc"-->
+                <!--android:icon="@drawable/ic_account_box_black_36dp"-->
+                <!--android:title="Выйти из аккаунта">-->
+            </item>
         </menu>
     </item>
-
 </menu>
