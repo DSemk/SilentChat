@@ -3,8 +3,6 @@ package com.example.disemk.silentchat.fragments;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.TextInputLayout;
@@ -13,43 +11,26 @@ import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
 import com.example.disemk.silentchat.R;
-import com.example.disemk.silentchat.activitys.MainActivity;
 import com.example.disemk.silentchat.engine.BaseDataMaster;
 import com.example.disemk.silentchat.engine.SingletonCM;
 import com.example.disemk.silentchat.models.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.android.gms.tasks.TaskExecutors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.melnykov.fab.FloatingActionButton;
-
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RoomsFragment extends android.app.Fragment implements View.OnFocusChangeListener {
@@ -57,7 +38,6 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     private static final String STOCK_MODE = "stock_m";
     private static final String CHILD_THREE = "all rooms";
     private static final String MY_ROOM_MODE = "myRoom_m";
-    private boolean FAB_Status = false;
     private final String usersCountText = "учасников : ";
 
     private Context context;
@@ -69,7 +49,6 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     public String userRoomName;
     private String mUid;
     public String roomKey;
-    private String usersCount;
     private ArrayList<String> usersList;
 
     private static RoomsFragment roomsInstanse = new RoomsFragment();
@@ -85,15 +64,15 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     private LinearLayoutManager mLinerLayoutManager;
     private ProgressBar mProgressBar;
     public FloatingActionButton mAddRoom;
-    private View rfView;
     private String fBAdapterMode;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_rooms, container, false);
-        rfView = view;
+
         context = SingletonCM.getInstance().getMainContext();
+
         initialize(view);
         setBackground(view);
         return view;
@@ -110,7 +89,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     }
 
     /**
-     * @param container
+     * @param container RoomsFragment container
      */
     private void initialize(final View container) {
         hasConnection(context);
@@ -122,18 +101,14 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         fBAdapterMode = "";
         editName = (EditText) container.findViewById(R.id.ad_addNewRoom_et);
         mUsernameLayout = (TextInputLayout) container.findViewById(R.id.add_room_layout_ad);
+
         // it's use when user input name for found room
         try {
             userFilterText = "";
             if (!SingletonCM.getInstance().getUserFilterRoom().isEmpty()) {
                 userFilterText = SingletonCM.getInstance().getUserFilterRoom();
             }
-//            fBAdapterMode = SingletonCM.getInstance().getfBAdapterMode();
-//            if (fBAdapterMode.isEmpty()) {
-//                Log.d("Adapter mode", " Null");
-//            }
         } catch (NullPointerException e) {
-//            fBAdapterMode = STOCK_MODE;
             e.printStackTrace();
         }
         Bundle bundle = getArguments();
@@ -345,13 +320,10 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         viewHolder.isFavoriteRomm(state);
     }
 
-    /**
-     * @param viewHolder - you know ;)
-     */
     private void onItemClickCustom(FireChatRoomViewHolder viewHolder, ChatRoom model) {
         SingletonCM.getInstance().setUserRoom(viewHolder.roomNameText.getText().toString());
         boolean found = false;
-        int count = 0;
+        int count;
         usersList = model.getUsersList();
         for (String s : usersList) {
             if (s.equals(mUid)) {
@@ -360,7 +332,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         }
         if (!found) {
             usersList.add(mUid);
-            count = Integer.parseInt(model.getUsersCount().toString());
+            count = Integer.parseInt(model.getUsersCount());
             count++;
             String countS = String.valueOf(count);
 
@@ -475,10 +447,6 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
 
     public void setUserFilterText(String userFilterText) {
         this.userFilterText = userFilterText;
-    }
-
-    public void setfBAdapterMode(String fBAdapterMode) {
-        this.fBAdapterMode = fBAdapterMode;
     }
 
     public static void hasConnection(final Context context) {

@@ -10,6 +10,7 @@ public class ChatMessage {
     private String photoUrl;
     private String room;
     private String uid;
+    private String msgPhotoUrl;
 
     public ChatMessage() {
     }
@@ -20,10 +21,28 @@ public class ChatMessage {
         this.photoUrl = photoUrl;
         this.room = room;
         this.uid = uid;
+
+    }
+
+    public ChatMessage(String text, String name, String photoUrl, String room, String uid, String msgPhotoUrl) {
+        this.text = text;
+        this.name = name;
+        this.photoUrl = photoUrl;
+        this.room = room;
+        this.uid = uid;
+        this.msgPhotoUrl = msgPhotoUrl;
     }
 
     public String getUid() {
         return uid;
+    }
+
+    public String getMsgPhotoUrl() {
+        return msgPhotoUrl;
+    }
+
+    public void setMsgPhotoUrl(String msgPhotoUrl) {
+        this.msgPhotoUrl = msgPhotoUrl;
     }
 
     public void setUid(String uid) {

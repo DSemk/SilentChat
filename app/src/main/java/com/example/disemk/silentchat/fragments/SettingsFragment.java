@@ -95,7 +95,6 @@ public class SettingsFragment extends Fragment {
     }
 
     private void saveStateBackground(int backId) {
-
         mSharedPreferences = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putInt(APP_PREFERENCES_BACKGROUND_ID, backId);

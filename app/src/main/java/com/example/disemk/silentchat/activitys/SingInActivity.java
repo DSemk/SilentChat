@@ -16,13 +16,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.disemk.silentchat.R;
-import com.example.disemk.silentchat.engine.BaseDataMaster;
 import com.example.disemk.silentchat.engine.SingletonCM;
-import com.example.disemk.silentchat.fragments.RoomsFragment;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -41,13 +38,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.util.ArrayList;
-
-/**
- * Created by disemk on 11.01.17.
- */
 
 public class SingInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "SingInActivity";
     private static final String APP_PREFERENCES = "silent_pref";
@@ -60,27 +53,15 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private BaseDataMaster dataMaster;
     private String uid;
 
     private SignInButton mSignInButton;
     private CheckBox checkInfo;
 
-    private boolean choiceUsr;
-
-
-    /**
-     * @metod - loadSharPrefData() - load user settings chenges;
-     * @metod initialize() - init all items & all ;
-     * @metod checkUserAuth() - check user is already singIn or no. If singIn, go to RoomsFragment;
-     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_singin);
-        choiceUsr = false;
-        Intent intent = getIntent();
-        choiceUsr = intent.getBooleanExtra("choiceUsr", false);
 
         // START config_singin
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -120,25 +101,28 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             }
 
         };
+
         initialize();
         loadSharPrefData();
         checkUserAuth();
     }
 
-    // Check you are a new user,or not.
+    // check user is already singIn or no. If user is login, go to RoomsFragment
     private void checkUserAuth() {
+
         if (mFirebaseUser != null) {
             pushFBaseUserInfo();
             startActivity(new Intent(SingInActivity.this, MainActivity.class).putExtra("status", false));
             finish();
-
         }
     }
 
-
+    // init all items & all
     private void initialize() {
+
         checkInfo = (CheckBox) findViewById(R.id.as_checkBox);
         mSignInButton = (SignInButton) findViewById(R.id.singIn_btn);
+
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,6 +137,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
     }
 
+    // Load user settings chenges
     private void loadSharPrefData() {
         try {
             mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
@@ -161,7 +146,8 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             SingletonCM.getInstance().setBackgroundID(R.drawable.back_4);
         }
 
-        if (mSharedPreferences.contains(APP_PREFERENCES_BACKGROUND_ID) &&
+        // load background & userID(get from FireBaseUser) from shared preferences
+        if (mSharedPreferences.contains(APP_PREFERENCES_BACKGROUND_ID) ||
                 mSharedPreferences.contains(APP_PREFERENCES_USER_ID)) {
             SingletonCM.getInstance().setBackgroundID(mSharedPreferences.getInt(APP_PREFERENCES_BACKGROUND_ID, 0));
             SingletonCM.getInstance().setUid(mSharedPreferences.getString(APP_PREFERENCES_USER_ID, ""));
@@ -210,14 +196,14 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                         } else {
 
                             // status == true,use in first run app on devise
-                            showAlrtDialog();
+                            showAlertDialog();
                         }
 
                     }
                 });
     }
 
-    private void showAlrtDialog() {
+    private void showAlertDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(SingInActivity.this);
         View view = layoutInflater.inflate(R.layout.alert_dialog_singin, null);
 
@@ -226,12 +212,13 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                 .Builder(new ContextThemeWrapper(SingInActivity.this, R.style.myDialog));
 
         builder.setView(view);
-        final EditText editName = (EditText) view.findViewById(R.id.ad_addNewRoom_et);
 
         builder.setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
+                        // Need hard restart app in first launch, because if not, first launch have many bugs :(
                         android.os.Process.killProcess(android.os.Process.myPid());
                     }
                 });
@@ -292,8 +279,4 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
         mGoogleApiClient.disconnect();
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
 }

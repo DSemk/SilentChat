@@ -25,6 +25,7 @@
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
 
@@ -36,22 +37,61 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:background="@color/blur_re"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/msgEditText"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:hint="Введите текст" />
+            android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/sendButton"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/ic_send_black_36dp" />
+            <ImageView
+                android:id="@+id/user_imgMsg_preview"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:padding="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <Button
+                android:id="@+id/addPhoto"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_add_a_photo_black_24dp"
+                android:padding="32dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <EditText
+                    android:id="@+id/msgEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:hint="Введите текст"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp" />
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/sendButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_send_black_36dp"
+                android:padding="32dp" />
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>
