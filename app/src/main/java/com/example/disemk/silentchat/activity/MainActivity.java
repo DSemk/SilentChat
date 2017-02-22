@@ -1,4 +1,4 @@
-package com.example.disemk.silentchat.activitys;
+package com.example.disemk.silentchat.activity;
 
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
@@ -17,12 +17,11 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.example.disemk.silentchat.R;
 import com.example.disemk.silentchat.engine.SingletonCM;
-import com.example.disemk.silentchat.fragments.RoomsFragment;
-import com.example.disemk.silentchat.fragments.SettingsFragment;
+import com.example.disemk.silentchat.fragment.RoomsFragment;
+import com.example.disemk.silentchat.fragment.SettingsFragment;
 
 import java.util.ArrayList;
 
@@ -33,12 +32,9 @@ public class MainActivity extends AppCompatActivity
     private static final String FAVORITE_MODE = "favorite_m";
     private static final String STOCK_MODE = "stock_m";
     private static final String MY_ROOM_MODE = "myRoom_m";
-    private static final String ALL_TITLE_NAME = "Все чаты";
-    private static final String ALERT_TITLE_NAME = "Поиск комнаты";
-
 
     private FragmentTransaction transaction;
-    private RoomsFragment roomsFragment;
+    public RoomsFragment roomsFragment;
     private SettingsFragment settingsFragment;
     private static long back_pressed;
 
@@ -49,15 +45,18 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle(ALL_TITLE_NAME);
+        setTitle(getString(R.string.all_room_mode));
 
         // setup different items from start
         initialize();
 
         // show RoomsFragment as default
-        transaction = getFragmentManager().beginTransaction();
-        transaction.add(R.id.ma_container, roomsFragment);
-        transaction.commit();
+        if (roomsFragment != null) {
+
+            transaction = getFragmentManager().beginTransaction();
+            transaction.add(R.id.ma_container, roomsFragment);
+            transaction.commit();
+        }
 
         headNDrawerCustom();
 
@@ -119,11 +118,11 @@ public class MainActivity extends AppCompatActivity
         builder.setView(view);
 
         // This edit text user use to input name new room.
-        // Then we create new room onFireBase Database, and show it in ChatFragment whis new room
+        // Then we create new room onFireBase Database, and show it in ChatFragment whi new room
         final EditText editName = (EditText) view.findViewById(R.id.ad_found_room_et);
 
         builder.setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.ok_btn_alert), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (!editName.getText().toString().isEmpty()) {
@@ -136,8 +135,8 @@ public class MainActivity extends AppCompatActivity
                              */
                             SingletonCM.getInstance().setfBAdapterMode(STOCK_MODE);
 
-                            RoomsFragment.getRoomsInstanse().setUserFilterText(editName.getText().toString());
-                            setTitle("Поиск : " + editName.getText().toString());
+                            roomsFragment.setUserFilterText(editName.getText().toString());
+                            setTitle(getString(R.string.search_room) + editName.getText().toString());
                             getFragmentManager()
                                     .beginTransaction()
                                     .detach(roomsFragment)
@@ -145,12 +144,12 @@ public class MainActivity extends AppCompatActivity
                                     .commit();
                         } else {
                             Toast.makeText(
-                                    MainActivity.this, "Введите имя комнаты",
+                                    MainActivity.this, getString(R.string.enter_name_toast),
                                     Toast.LENGTH_SHORT
                             ).show();
                         }
                     }
-                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                }).setNegativeButton(getString(R.string.cancel_btn_aler), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -158,7 +157,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         AlertDialog alertDialog = builder.create();
-        alertDialog.setTitle(ALERT_TITLE_NAME);
+        alertDialog.setTitle(getString(R.string.search_room));
         alertDialog.show();
     }
 
@@ -199,9 +198,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_found) {
             createAlertDialog();
         } else if (id == R.id.nav_all_chats) {
-
-            setTitle(R.string.all_room_mode_ru);
+            setTitle(R.string.all_room_mode);
             RoomsFragment fragment = new RoomsFragment();
+
             // setUserFilterRoom need by is - "" from init all rooms.
             SingletonCM.getInstance().setUserFilterRoom("");
             bundle.putString("mode", STOCK_MODE);
@@ -210,12 +209,12 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_settings) {
 
-            setTitle(R.string.settings_mode_ru);
+            setTitle(R.string.settings_mode);
             transaction.replace(R.id.ma_container, settingsFragment).addToBackStack(null);
 
         } else if (id == R.id.nav_favorite) {
 
-            setTitle(R.string.favorite_room_mode_ru);
+            setTitle(R.string.favorite_room_mode);
             ArrayList<String> favoriteRooms = new ArrayList<>();
             try {
                 favoriteRooms = SingletonCM.getInstance().getFavoriteRoomList();
@@ -233,7 +232,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_myRoom) {
 
-            setTitle(R.string.my_room_mode_ru);
+            setTitle(R.string.my_room_mode);
             RoomsFragment fragment = new RoomsFragment();
 
             bundle.putString("mode", MY_ROOM_MODE);

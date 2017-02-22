@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:text="@string/sing_info_ru"
+        android:text="@string/sing_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="16dp"
@@ -25,7 +25,7 @@
         android:layout_marginBottom="46dp"></com.google.android.gms.common.SignInButton>
 
     <CheckBox
-        android:text="Я принимаю эти условия."
+        android:text="@string/accept_lic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/as_checkBox"

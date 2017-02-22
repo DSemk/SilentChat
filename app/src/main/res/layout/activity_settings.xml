@@ -17,7 +17,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginTop="16dp"
-            android:text="Выбрать фон для чата" />
+            android:text="@string/chose_wallpaper_text" />
 
         <RelativeLayout
             android:layout_width="match_parent"

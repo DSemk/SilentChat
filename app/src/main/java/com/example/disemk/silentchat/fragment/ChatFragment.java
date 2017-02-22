@@ -1,4 +1,4 @@
-package com.example.disemk.silentchat.fragments;
+package com.example.disemk.silentchat.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Context;

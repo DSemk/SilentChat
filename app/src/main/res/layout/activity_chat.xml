@@ -8,7 +8,7 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
-    tools:context="com.example.disemk.silentchat.fragments.ChatFragment">
+    tools:context="com.example.disemk.silentchat.fragment.ChatFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messageRecyclerView"
@@ -78,7 +78,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:hint="Введите текст"
+                    android:hint="@string/input_msg"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp" />
             </LinearLayout>

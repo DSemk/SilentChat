@@ -1,4 +1,4 @@
-package com.example.disemk.silentchat.fragments;
+package com.example.disemk.silentchat.fragment;
 
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -38,8 +38,8 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     private static final String STOCK_MODE = "stock_m";
     private static final String CHILD_THREE = "all rooms";
     private static final String MY_ROOM_MODE = "myRoom_m";
-    private final String usersCountText = "учасников : ";
 
+    private String usersCountText = "";
     private Context context;
     private String userFilterText;
     private ChatFragment chatFragment;
@@ -50,8 +50,6 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     private String mUid;
     public String roomKey;
     private ArrayList<String> usersList;
-
-    private static RoomsFragment roomsInstanse = new RoomsFragment();
     private ArrayList<String> favoriteRooms;
     private EditText editName;
     private TextInputLayout mUsernameLayout;
@@ -92,6 +90,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
      * @param container RoomsFragment container
      */
     private void initialize(final View container) {
+
         hasConnection(context);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
@@ -99,6 +98,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         dataMaster = BaseDataMaster.getDataMaster(context);
         mUid = mFirebaseUser.getUid();
         fBAdapterMode = "";
+        usersCountText = getString(R.string.users_count);
         editName = (EditText) container.findViewById(R.id.ad_addNewRoom_et);
         mUsernameLayout = (TextInputLayout) container.findViewById(R.id.add_room_layout_ad);
 
@@ -180,7 +180,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         } else if (fBAdapterMode.equals(FAVORITE_MODE)) {
 
             if (favoriteRooms.size() == 0 || favoriteRooms.isEmpty()) {
-                Toast.makeText(context, "Пока здесь пусто", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getString(R.string.empty_toast), Toast.LENGTH_SHORT).show();
             } else {
                 mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<ChatRoom, FireChatRoomViewHolder>(
                         ChatRoom.class,
@@ -293,11 +293,11 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         }
         if (!foundKey.equals("")) {
             dataMaster.deleteItem(key);
-            Toast.makeText(context, "Удалено", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getString(R.string.delete_toast), Toast.LENGTH_SHORT).show();
             viewHolder.isFavoriteRomm(false);
         } else {
             dataMaster.insertKey(key);
-            Toast.makeText(context, "Добавлено", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getString(R.string.add_toast), Toast.LENGTH_SHORT).show();
             viewHolder.isFavoriteRomm(true);
         }
         synchronizeRoomListAndDB();
@@ -366,7 +366,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         editName = (EditText) view.findViewById(R.id.ad_addNewRoom_et);
         builder.setView(view);
         builder.setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.ok_btn_alert), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (!editName.getText().toString().isEmpty()) {
@@ -383,7 +383,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
                             fragmentTransaction.commit();
                         }
                     }
-                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                }).setNegativeButton(getString(R.string.cancel_btn_aler), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -391,7 +391,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         });
 
         AlertDialog alertDialog = builder.create();
-        alertDialog.setTitle("Новый чат");
+        alertDialog.setTitle(getString(R.string.new_chat_alert));
         alertDialog.show();
     }
 
@@ -402,10 +402,6 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         if (id != 0) {
             recyclerView.setBackgroundResource(id);
         }
-    }
-
-    public static RoomsFragment getRoomsInstanse() {
-        return roomsInstanse;
     }
 
     public static class FireChatRoomViewHolder extends RecyclerView.ViewHolder {
@@ -437,19 +433,20 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         public void isFavoriteRomm(boolean state) {
             if (state) {
                 favoriteStar.setBackgroundResource(R.drawable.ic_star_black_24dp);
-                favoriteText.setText(R.string.room_list_star_text_done_ru);
+                favoriteText.setText(R.string.room_list_star_text_done);
             } else {
                 favoriteStar.setBackgroundResource(R.drawable.ic_star_border_black_24dp);
-                favoriteText.setText(R.string.room_list_star_text_add_ru);
+                favoriteText.setText(R.string.room_list_star_text_add);
             }
         }
     }
 
+    // This metod called from MainActivity and set filter text to found room
     public void setUserFilterText(String userFilterText) {
         this.userFilterText = userFilterText;
     }
 
-    public static void hasConnection(final Context context) {
+    public void hasConnection(final Context context) {
         boolean connect = false;
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -472,14 +469,14 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
                     .Builder(new ContextThemeWrapper(context, R.style.myDialog));
             builder.setView(view);
             builder.setCancelable(false)
-                    .setPositiveButton("Выход", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getString(R.string.exit_alert), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             android.os.Process.killProcess(android.os.Process.myPid());
                         }
                     });
             AlertDialog alertDialog = builder.create();
-            alertDialog.setTitle("Ошибка");
+            alertDialog.setTitle(getString(R.string.error_alert));
             alertDialog.show();
         }
 

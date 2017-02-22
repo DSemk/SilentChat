@@ -1,4 +1,4 @@
-package com.example.disemk.silentchat.activitys;
+package com.example.disemk.silentchat.activity;
 
 import android.content.Intent;
 import android.os.Bundle;

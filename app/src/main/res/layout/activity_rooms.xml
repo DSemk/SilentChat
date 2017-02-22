@@ -10,7 +10,7 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.disemk.silentchat.fragments.RoomsFragment">
+    tools:context="com.example.disemk.silentchat.fragment.RoomsFragment">
 
 
     <android.support.v7.widget.RecyclerView

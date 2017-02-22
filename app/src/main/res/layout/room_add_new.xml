@@ -7,7 +7,6 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Введите текст"
         android:id="@+id/ad_addNewRoom_et" />
 
 </LinearLayout>

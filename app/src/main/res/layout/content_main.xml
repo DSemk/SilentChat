@@ -10,7 +10,7 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.disemk.silentchat.activitys.MainActivity"
+    tools:context="com.example.disemk.silentchat.activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
     <RelativeLayout
