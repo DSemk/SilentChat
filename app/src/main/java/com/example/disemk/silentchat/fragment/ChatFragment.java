@@ -35,6 +35,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -59,6 +60,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatFragment extends android.app.Fragment implements SoundPool.OnLoadCompleteListener {
@@ -293,32 +295,42 @@ public class ChatFragment extends android.app.Fragment implements SoundPool.OnLo
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String FILENAME = "image.png";
         }
 
         Bitmap img = null;
 
         if (requestCode == REQUEST) {
 
-            Uri selectedImage = data.getData();
-            mPreviewPhoto.setVisibility(View.VISIBLE);
-            Date currentDate = new Date(System.currentTimeMillis());
-            imgBucked = mUid + currentDate.toString();
+            Uri selectedImage = null;
             try {
-                img = MediaStore.Images.Media.getBitmap(context.getContentResolver(), selectedImage);
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+                selectedImage = data.getData();
+            } catch (NullPointerException e) {
                 e.printStackTrace();
             }
-            if (img != null) {
-                mPreviewPhoto.setImageBitmap(img);
-            }
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            img.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+            if (selectedImage != null) {
+                mPreviewPhoto.setVisibility(View.VISIBLE);
+                Date currentDate = new Date(System.currentTimeMillis());
+                imgBucked = mUid + currentDate.toString();
+                try {
+                    img = MediaStore.Images.Media.getBitmap(context.getContentResolver(), selectedImage);
 
-            uploadFile(selectedImage);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (img != null) {
+                    mPreviewPhoto.setImageBitmap(img);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    img.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+
+                    uploadFile(selectedImage);
+                }
+
+            } else {
+                Toast.makeText(context, getString(R.string.cancel_btn_aler), Toast.LENGTH_SHORT).show();
+            }
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
