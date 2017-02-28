@@ -143,7 +143,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
             // load favorite rooms from db
         } catch (Resources.NotFoundException e) {
-            SingletonCM.getInstance().setBackgroundID(R.drawable.back_2);
+            SingletonCM.getInstance().setBackgroundID(R.drawable.back_3);
         }
 
         // load background & userID(get from FireBaseUser) from shared preferences

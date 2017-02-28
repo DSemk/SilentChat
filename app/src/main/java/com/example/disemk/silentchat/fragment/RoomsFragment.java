@@ -80,7 +80,6 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
     public void onFocusChange(View v, boolean hasFocus) {
         if (v != editName && editName.getText().toString().isEmpty()) {
             mUsernameLayout.setErrorEnabled(true);
-            mUsernameLayout.setError("Поле для ввода пустое");
         } else {
             mUsernameLayout.setErrorEnabled(false);
         }
@@ -129,6 +128,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
         mAddRoom.attachToRecyclerView(mRoomRecyclerView);
 
         synchronizeRoomListAndDB();
+
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         if (fBAdapterMode.equals(STOCK_MODE)) {
 

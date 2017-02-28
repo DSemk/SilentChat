@@ -128,7 +128,9 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (!editName.getText().toString().isEmpty()) {
-
+                            RoomsFragment fragment = new RoomsFragment();
+                            Bundle bundle = new Bundle();
+                            transaction = getFragmentManager().beginTransaction();
                             SingletonCM.getInstance()
                                     .setUserFilterRoom(editName.getText().toString());
                             /**
@@ -138,12 +140,10 @@ public class MainActivity extends AppCompatActivity
                             SingletonCM.getInstance().setfBAdapterMode(STOCK_MODE);
 
                             roomsFragment.setUserFilterText(editName.getText().toString());
-                            setTitle(getString(R.string.search_room) + editName.getText().toString());
-                            getFragmentManager()
-                                    .beginTransaction()
-                                    .detach(roomsFragment)
-                                    .attach(roomsFragment)
-                                    .commit();
+                            setTitle(getString(R.string.search_room) + " : " + editName.getText().toString());
+                            bundle.putString("mode", STOCK_MODE);
+                            fragment.setArguments(bundle);
+                            transaction.replace(R.id.ma_container, fragment).addToBackStack(null).commit();
                         } else {
                             Toast.makeText(
                                     MainActivity.this, getString(R.string.enter_name_toast),
