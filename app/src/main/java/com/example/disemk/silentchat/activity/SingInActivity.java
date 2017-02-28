@@ -129,7 +129,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
                 if (checkInfo.isChecked()) {
                     authorize();
                 } else {
-                    Toast.makeText(SingInActivity.this, "Сначала приймите правила лиц. соглашения", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SingInActivity.this, getString(R.string.not_accept_lic), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -143,7 +143,7 @@ public class SingInActivity extends AppCompatActivity implements GoogleApiClient
             mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
             // load favorite rooms from db
         } catch (Resources.NotFoundException e) {
-            SingletonCM.getInstance().setBackgroundID(R.drawable.back_4);
+            SingletonCM.getInstance().setBackgroundID(R.drawable.back_2);
         }
 
         // load background & userID(get from FireBaseUser) from shared preferences

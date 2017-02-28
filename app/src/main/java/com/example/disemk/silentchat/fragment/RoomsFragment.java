@@ -67,7 +67,7 @@ public class RoomsFragment extends android.app.Fragment implements View.OnFocusC
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_rooms, container, false);
+        View view = inflater.inflate(R.layout.fragment_rooms, container, false);
 
         context = SingletonCM.getInstance().getMainContext();
 

@@ -100,7 +100,7 @@ public class ChatFragment extends android.app.Fragment implements SoundPool.OnLo
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_chat, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
         romName = SingletonCM.getInstance().getUserRoom();
         context = SingletonCM.getInstance().getMainContext();

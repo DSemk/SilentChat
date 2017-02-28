@@ -2,10 +2,10 @@
 <resources>
     <color name="colorPrimary">#6c7ee1</color>
     <color name="colorPrimaryDark">#6d7ee9</color>
-    <color name="colorAccent">#fa8a4a</color>
+    <color name="colorAccent">#ff791f</color>
     <color name="colorRoom">#6498ea</color>
     <color name="colorRoomText">#000000</color>
-    <color name="blue">#214dba</color>
+    <color name="darkBlue">#2d4787</color>
     <color name="editMsgColor">#b6484848</color>
     <color name="material_gray_300">#E0E0E0</color>
     <color name="material_green_300">#6ece6e</color>

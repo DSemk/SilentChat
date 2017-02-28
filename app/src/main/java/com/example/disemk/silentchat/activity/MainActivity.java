@@ -17,9 +17,11 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.example.disemk.silentchat.R;
 import com.example.disemk.silentchat.engine.SingletonCM;
+import com.example.disemk.silentchat.fragment.AboutFragment;
 import com.example.disemk.silentchat.fragment.RoomsFragment;
 import com.example.disemk.silentchat.fragment.SettingsFragment;
 
@@ -197,6 +199,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_found) {
             createAlertDialog();
+
         } else if (id == R.id.nav_all_chats) {
             setTitle(R.string.all_room_mode);
             RoomsFragment fragment = new RoomsFragment();
@@ -238,6 +241,12 @@ public class MainActivity extends AppCompatActivity
             bundle.putString("mode", MY_ROOM_MODE);
             fragment.setArguments(bundle);
             transaction.replace(R.id.ma_container, fragment).addToBackStack(null);
+
+        } else if (id == R.id.nav_about) {
+
+            setTitle(getString(R.string.about_mode));
+            AboutFragment aboutFragment = new AboutFragment();
+            transaction.replace(R.id.ma_container, aboutFragment).addToBackStack(null);
         }
 
         transaction.commit();

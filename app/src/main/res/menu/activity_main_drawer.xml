@@ -22,6 +22,10 @@
     <item android:title="@string/group_other">
         <menu>
             <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_info_black_24dp"
+                android:title="@string/about_mode"></item>
+            <item
                 android:id="@+id/nav_settings"
                 android:icon="@drawable/ic_settings_black_36dp"
                 android:title="@string/settings_mode">
